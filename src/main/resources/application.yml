@@ -31,6 +31,10 @@ spring:
         scheduling:
             pool:
                 size: 5
+    redis:
+        host: 43.130.230.251
+        port: 6379
+        password: 562616@Bai
 
 
 #mybatis

@@ -14,7 +14,6 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
@@ -22,7 +21,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @RestController
-@RequestMapping(value = "/mj")
 public class WxApiController {
 
     @Autowired
@@ -57,7 +55,7 @@ public class WxApiController {
         return R.ok();
     }
 
-    @PostMapping("/checkUserSubscribeOnline")
+    @PostMapping("/checkOnline")
     public R checkUserSubscribeOnline(String openid) {
         String key = "checkSubscribeOnline_" + openid;
         if (redisTemplate.opsForValue().get(key) == null) {
@@ -75,7 +73,7 @@ public class WxApiController {
         return R.ok();
     }
 
-    @PostMapping("/checkUserSubscribe")
+    @PostMapping("/check")
     public R checkUserSubscribe(String openid) {
         String key = "checkSubscribe_" + openid;
         if (redisTemplate.opsForValue().get(key) == null) {

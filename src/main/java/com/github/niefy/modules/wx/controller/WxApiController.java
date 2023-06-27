@@ -7,6 +7,7 @@ import com.github.niefy.modules.wx.entity.WxAccount;
 import com.github.niefy.modules.wx.entity.WxUser;
 import com.github.niefy.modules.wx.service.WxAccountService;
 import com.github.niefy.modules.wx.service.WxUserService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -19,7 +20,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
+@Slf4j
 @RestController
 public class WxApiController {
 
@@ -75,6 +76,7 @@ public class WxApiController {
 
     @PostMapping("/check")
     public R checkUserSubscribe(String openid) {
+        log.info("openid:{}",openid);
         String key = "checkSubscribe_" + openid;
         if (redisTemplate.opsForValue().get(key) == null) {
             WxUser wxUser = userService.getById(openid);

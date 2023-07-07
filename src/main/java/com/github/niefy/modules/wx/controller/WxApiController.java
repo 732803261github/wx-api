@@ -106,9 +106,10 @@ public class WxApiController {
             redisTemplate.opsForValue().set("wxopenid", list.get(0).getAppid());
             redisTemplate.opsForValue().set("wxsecret", list.get(0).getSecret());
         }
-        String appid = redisTemplate.opsForValue().get("wxopenid").toString();
+//        String appid = redisTemplate.opsForValue().get("wxopenid").toString();
+        String appid = "wxbf2afefa7dfefa54";
         //	项目服务器url
-        String redirect_uri = "http://www.ai-assistant.com.cn:443/wx/invoke";
+        String redirect_uri = "ai-assistant.com.cn/wx/invoke";
         try {
             redirect_uri = URLEncoder.encode(redirect_uri, "UTF-8");
         } catch (Exception e) {
@@ -128,8 +129,10 @@ public class WxApiController {
     @GetMapping(value = "/invoke")
     public void invoke(HttpServletRequest request) {
         String code = request.getParameter("code");
-        String appid = redisTemplate.opsForValue().get("wxopenid").toString();
-        String secret = redisTemplate.opsForValue().get("wxsecret").toString();
+//        String appid = redisTemplate.opsForValue().get("wxopenid").toString();
+//        String secret = redisTemplate.opsForValue().get("wxsecret").toString();
+        String appid = "wxbf2afefa7dfefa54";
+        String secret = "061a3a89b17568868394680c89707d93";
         //认证服务器
         String url = "https://api.weixin.qq.com/sns/oauth2/access_token?" +
                 "appid=" + appid +

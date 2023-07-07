@@ -49,10 +49,10 @@ public class WxApiController {
     public R getWxToken() {
         if (redisTemplate.opsForValue().get("appid") == null) {
             List<WxAccount> list = accountService.list();
-            redisTemplate.opsForValue().set("wxopenid", list.get(0).getAppid());
+            redisTemplate.opsForValue().set("wxappid", list.get(0).getAppid());
             redisTemplate.opsForValue().set("wxsecret", list.get(0).getSecret());
         }
-        String appid = redisTemplate.opsForValue().get("wxopenid").toString();
+        String appid = redisTemplate.opsForValue().get("wxappid").toString();
         String secret = redisTemplate.opsForValue().get("wxsecret").toString();
         String URL = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=" + appid + "&secret=" + secret;
         if (redisTemplate.opsForValue().get("wxtoken") == null) {
@@ -105,12 +105,10 @@ public class WxApiController {
     public String oauth(HttpServletResponse response) throws IOException {
         if (redisTemplate.opsForValue().get("appid") == null) {
             List<WxAccount> list = accountService.list();
-            redisTemplate.opsForValue().set("wxopenid", list.get(0).getAppid());
+            redisTemplate.opsForValue().set("wxappid", list.get(0).getAppid());
             redisTemplate.opsForValue().set("wxsecret", list.get(0).getSecret());
         }
-        String appid = redisTemplate.opsForValue().get("wxopenid").toString();
-        String appId = "wxbf2afefa7dfefa54";
-        //	项目服务器url
+        String appId = redisTemplate.opsForValue().get("wxappid").toString();
         String redirectUri = URLEncoder.encode("http://www.ai-assistant.com.cn/wx/invoke", "UTF-8");
         String authorizeUrl = String.format("https://open.weixin.qq.com/connect/oauth2/authorize?appid=%s&redirect_uri=%s&response_type=code&scope=snsapi_userinfo&state=%s#wechat_redirect", appId, redirectUri, "state");
         return authorizeUrl; //重定向网页
@@ -119,11 +117,8 @@ public class WxApiController {
     @GetMapping(value = "/invoke")
     public void invoke(HttpServletRequest request) {
         String code = request.getParameter("code");
-//        String appid = redisTemplate.opsForValue().get("wxopenid").toString();
-//        String secret = redisTemplate.opsForValue().get("wxsecret").toString();
-        String appid = "wxbf2afefa7dfefa54";
-        String secret = "061a3a89b17568868394680c89707d93";
-        //认证服务器
+        String appid = redisTemplate.opsForValue().get("wxappid").toString();
+        String secret = redisTemplate.opsForValue().get("wxsecret").toString();
         String url = "https://api.weixin.qq.com/sns/oauth2/access_token?" +
                 "appid=" + appid +
                 "&secret=" + secret +

@@ -8,16 +8,16 @@ import com.github.niefy.modules.wx.entity.WxUser;
 import com.github.niefy.modules.wx.service.WxAccountService;
 import com.github.niefy.modules.wx.service.WxUserService;
 import lombok.extern.slf4j.Slf4j;
+import me.chanjar.weixin.common.error.WxErrorException;
+import me.chanjar.weixin.mp.api.WxMpService;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -38,6 +38,8 @@ public class WxApiController {
     private WxAccountService accountService;
     @Autowired
     private WxUserService userService;
+    @Autowired
+    private WxMpService wxMpService;
 
 
     RestTemplate restTemplate = new RestTemplate();
@@ -100,30 +102,18 @@ public class WxApiController {
     }
 
     @GetMapping(value = "/oauth")
-    public void oauth(HttpServletResponse response) throws IOException {
+    public String oauth(HttpServletResponse response) throws IOException {
         if (redisTemplate.opsForValue().get("appid") == null) {
             List<WxAccount> list = accountService.list();
             redisTemplate.opsForValue().set("wxopenid", list.get(0).getAppid());
             redisTemplate.opsForValue().set("wxsecret", list.get(0).getSecret());
         }
-//        String appid = redisTemplate.opsForValue().get("wxopenid").toString();
-        String appid = "wxbf2afefa7dfefa54";
+        String appid = redisTemplate.opsForValue().get("wxopenid").toString();
+        String appId = "wxbf2afefa7dfefa54";
         //	项目服务器url
-        String redirect_uri = "ai-assistant.com.cn/wx/invoke";
-        try {
-            redirect_uri = URLEncoder.encode(redirect_uri, "UTF-8");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        String url = "https://open.weixin.qq.com/connect/oauth2/authorize?" +
-                "appid=" + appid +
-                "&redirect_uri=" + redirect_uri +
-                "&response_type=code" +
-                "&scope=snsapi_userinfo" +
-                "&state=1"+
-                "#wechat_redirect";
-        log.info("url={}", url);
-        response.sendRedirect(url);
+        String redirectUri = URLEncoder.encode("http://www.ai-assistant.com.cn/wx/invoke", "UTF-8");
+        String authorizeUrl = String.format("https://open.weixin.qq.com/connect/oauth2/authorize?appid=%s&redirect_uri=%s&response_type=code&scope=snsapi_userinfo&state=%s#wechat_redirect", appId, redirectUri, "state");
+        return "redirect:" + authorizeUrl; //重定向网页
     }
 
     @GetMapping(value = "/invoke")

@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -107,25 +108,26 @@ public class WxApiController {
         }
         String appid = redisTemplate.opsForValue().get("wxopenid").toString();
         //	项目服务器url
-        String path = "ai-assistant.com.cn:8088/wx/" + "invoke";
+        String redirect_uri = "http://www.ai-assistant.com.cn:443/wx/invoke";
         try {
-            path = URLEncoder.encode(path, "UTF-8");
+            redirect_uri = URLEncoder.encode(redirect_uri, "UTF-8");
         } catch (Exception e) {
             e.printStackTrace();
         }
         String url = "https://open.weixin.qq.com/connect/oauth2/authorize?" +
                 "appid=" + appid +
-                "&redirect_uri=" + path +
+                "&redirect_uri=" + redirect_uri +
                 "&response_type=code" +
                 "&scope=snsapi_userinfo" +
-                "&state=comi" +
+                "&state=1"+
                 "#wechat_redirect";
         log.info("url={}", url);
         response.sendRedirect(url);
     }
 
     @GetMapping(value = "/invoke")
-    public void invoke(String code) {
+    public void invoke(HttpServletRequest request) {
+        String code = request.getParameter("code");
         String appid = redisTemplate.opsForValue().get("wxopenid").toString();
         String secret = redisTemplate.opsForValue().get("wxsecret").toString();
         //认证服务器

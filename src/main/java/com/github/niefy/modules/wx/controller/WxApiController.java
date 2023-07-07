@@ -113,7 +113,7 @@ public class WxApiController {
         //	项目服务器url
         String redirectUri = URLEncoder.encode("http://www.ai-assistant.com.cn/wx/invoke", "UTF-8");
         String authorizeUrl = String.format("https://open.weixin.qq.com/connect/oauth2/authorize?appid=%s&redirect_uri=%s&response_type=code&scope=snsapi_userinfo&state=%s#wechat_redirect", appId, redirectUri, "state");
-        return "redirect:" + authorizeUrl; //重定向网页
+        return authorizeUrl; //重定向网页
     }
 
     @GetMapping(value = "/invoke")

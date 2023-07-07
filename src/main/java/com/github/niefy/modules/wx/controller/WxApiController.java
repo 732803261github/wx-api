@@ -107,7 +107,7 @@ public class WxApiController {
         }
         String appid = redisTemplate.opsForValue().get("wxopenid").toString();
         //	项目服务器url
-        String path = "http://localhost:8088/wx/" + "invoke";
+        String path = "ai-assistant.com.cn:8088/wx/" + "invoke";
         try {
             path = URLEncoder.encode(path, "UTF-8");
         } catch (Exception e) {

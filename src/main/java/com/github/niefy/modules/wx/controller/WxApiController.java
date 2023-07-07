@@ -109,7 +109,7 @@ public class WxApiController {
 //        String appid = redisTemplate.opsForValue().get("wxopenid").toString();
         String appid = "wxbf2afefa7dfefa54";
         //	项目服务器url
-        String redirect_uri = "ai-assistant.com.cn/wx/invoke";
+        String redirect_uri = "ai-assistant.com.cn/wx/wx/invoke";
         try {
             redirect_uri = URLEncoder.encode(redirect_uri, "UTF-8");
         } catch (Exception e) {

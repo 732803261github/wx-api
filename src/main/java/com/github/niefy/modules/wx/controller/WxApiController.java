@@ -7,10 +7,12 @@ import com.github.niefy.modules.wx.entity.WxAccount;
 import com.github.niefy.modules.wx.entity.WxUser;
 import com.github.niefy.modules.wx.service.WxAccountService;
 import com.github.niefy.modules.wx.service.WxUserService;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.error.WxErrorException;
 import me.chanjar.weixin.mp.api.WxMpService;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -21,9 +23,13 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.URLEncoder;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -45,7 +51,7 @@ public class WxApiController {
     RestTemplate restTemplate = new RestTemplate();
 
 
-    @GetMapping("/wxtoken")
+    @GetMapping("/getWxToken")
     public R getWxToken() {
         if (redisTemplate.opsForValue().get("appid") == null) {
             List<WxAccount> list = accountService.list();
@@ -68,23 +74,6 @@ public class WxApiController {
         return R.ok();
     }
 
-/*    @PostMapping("/checkOnline")
-    public R checkUserSubscribeOnline(String openid) {
-        String key = "checkSubscribeOnline_" + openid;
-        if (redisTemplate.opsForValue().get(key) == null) {
-            String accessToken = JSON.parseObject(getWxToken().get("data").toString()).getString("access_token");
-            String URL = "https://api.weixin.qq.com/cgi-bin/user/info?access_token=" + accessToken + "&openid=" + openid + "&lang=zh_CN";
-            ResponseEntity<String> response = restTemplate.getForEntity(URL, String.class);
-            if (response.getStatusCodeValue() == 200) {
-                redisTemplate.opsForValue().set(key, response.getBody(), 300, TimeUnit.SECONDS);
-                JSONObject jsonObject = JSON.parseObject(response.getBody());
-                return R.ok().put(jsonObject);
-            }
-        } else {
-            return R.ok().put(JSON.parseObject(redisTemplate.opsForValue().get(key).toString()));
-        }
-        return R.ok();
-    }*/
 
     @PostMapping("/check")
     public R checkUserSubscribe(String openid) {
@@ -111,20 +100,15 @@ public class WxApiController {
         String appId = redisTemplate.opsForValue().get("wxappid").toString();
         String redirectUri = URLEncoder.encode("http://www.ai-assistant.com.cn/wx/invoke", "UTF-8");
         String authorizeUrl = String.format("https://open.weixin.qq.com/connect/oauth2/authorize?appid=%s&redirect_uri=%s&response_type=code&scope=snsapi_userinfo&state=%s#wechat_redirect", appId, redirectUri, "state");
-        return authorizeUrl; //重定向网页
+        return authorizeUrl;
     }
 
     @GetMapping(value = "/invoke")
-    public void invoke(HttpServletRequest request) {
+    public String invoke(HttpServletRequest request) throws UnsupportedEncodingException {
         String code = request.getParameter("code");
         String appid = redisTemplate.opsForValue().get("wxappid").toString();
         String secret = redisTemplate.opsForValue().get("wxsecret").toString();
-        String url = "https://api.weixin.qq.com/sns/oauth2/access_token?" +
-                "appid=" + appid +
-                "&secret=" + secret +
-                "&code=" + code +
-                "&grant_type=authorization_code";
-
+        String url = String.format("https://api.weixin.qq.com/sns/oauth2/access_token?appid=%s&secret=%s&code=%s&grant_type=authorization_code",appid,secret,code);
         ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
         if (response.getStatusCodeValue() == 200) {
             JSONObject jsonObject = JSON.parseObject(response.getBody());
@@ -132,13 +116,79 @@ public class WxApiController {
             String access_token = jsonObject.getString("access_token");
             String openid = jsonObject.getString("openid");
             //第三步：拉取用户信息
-            String userInfoUrl = "https://api.weixin.qq.com/sns/userinfo?" +
-                    "access_token=" + access_token +
-                    "&openid=" + openid +
-                    "&lang=zh_CN";
+            String userInfoUrl = String.format("https://api.weixin.qq.com/sns/userinfo?access_token=%s&openid=%s&lang=zh_CN",access_token,openid);
             ResponseEntity<String> response2 = restTemplate.getForEntity(userInfoUrl, String.class);
-            JSONObject userJson = JSONObject.parseObject(response2.getBody());
-            log.info("userJson=====" + userJson);
+            String front = String.format("http://www.ai-assistant.com.cn:81?userInfo=%s",URLEncoder.encode(response2.getBody(),"UTF-8"));
+            return "redirect:"+front;
+        } else {
+            return "redirect:http://www.ai-assistant.com.cn:81?userInfo={}";
+        }
+    }
+
+//    @GetMapping(value = "/invoke")
+//    public R invoke(HttpServletRequest request) {
+//        JSONObject userJson = JSONObject.parseObject("{\n" +
+//                "    \"country\": \"\",\n" +
+//                "    \"province\": \"\",\n" +
+//                "    \"city\": \"\",\n" +
+//                "    \"openid\": \"o731S6QvW6NlhTkJyGYJNItsu9a8\",\n" +
+//                "    \"sex\": 0,\n" +
+//                "    \"nickname\": \"nope\",\n" +
+//                "    \"headimgurl\": \"https://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTKXibCpNjT7gCEjSHWm02AzDmXpI0Z5gicw2t7VyS4klQ63NF5v9CNg4oE4vz2zcSlOibQe1C6pjegnQ/132\",\n" +
+//                "    \"language\": \"\",\n" +
+//                "    \"privilege\": []\n" +
+//                "}");
+//        return R.ok().put(userJson);
+//    }
+
+    @GetMapping(value = "/pcAuth")
+    public R pageAuth() throws UnsupportedEncodingException {
+        if (redisTemplate.opsForValue().get("qrcode") == null) {
+            String token = JSON.parseObject(getWxToken().get("data").toString()).getString("access_token");
+            String url = String.format("https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token=%s", token);
+            JSONObject jsonObject = JSON.parseObject("{\"action_name\": \"QR_LIMIT_SCENE\", \"action_info\": {\"scene\": {\"scene_id\": \"pcAuth\"}}}");
+            ResponseEntity<String> response = restTemplate.postForEntity(url, jsonObject, String.class);
+            if (response.getStatusCodeValue() == 200) {
+                JSONObject qrcode = JSONObject.parseObject(response.getBody());
+                if (StringUtils.isNotEmpty(qrcode.getString("ticket"))) {
+                    String tickUrl = String.format("https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=%s", URLEncoder.encode(qrcode.getString("ticket"), "UTF-8"));
+                    genQrcode(URLEncoder.encode(qrcode.getString("ticket"), "UTF-8"));
+                    ResponseEntity<String> responseEntity = restTemplate.getForEntity(tickUrl, String.class);
+                    redisTemplate.opsForValue().set("qrcode", responseEntity.getBody());
+                    return R.ok().put(responseEntity);
+
+                }
+            } else {
+                return R.error();
+            }
+        } else {
+            return R.ok().put(redisTemplate.opsForValue().get("qrcode"));
+        }
+        return R.ok();
+    }
+
+    public void genQrcode(String ticket) {
+        URL url = null;
+        try {
+            //请求的路径
+            String qrUrl = "https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=" + ticket;
+            url = new URL(qrUrl);
+            DataInputStream dataInputStream = new DataInputStream(url.openStream());
+            FileOutputStream fileOutputStream = new FileOutputStream("/Users/chenxiaoming/Desktop/qrcode.jpg");//下载的位置及文件名
+            ByteArrayOutputStream output = new ByteArrayOutputStream();
+            byte[] buffer = new byte[1024];
+            int length;
+
+            while ((length = dataInputStream.read(buffer)) > 0) {
+                output.write(buffer, 0, length);
+            }
+            fileOutputStream.write(output.toByteArray());
+            dataInputStream.close();
+            fileOutputStream.close();
+        } catch (MalformedURLException e) {
+            System.out.println(e);
+        } catch (IOException e) {
+            System.out.println(e);
         }
     }
 }

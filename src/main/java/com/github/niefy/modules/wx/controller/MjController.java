@@ -27,11 +27,11 @@ public class MjController {
         HttpHeaders headers = new HttpHeaders();
         headers.set("authorization", String.valueOf(redisTemplate.opsForValue().get("authorization")));
         HttpEntity requestEntity = new HttpEntity(headers);
-        JSONObject response = restTemplate.exchange(
+        String response = restTemplate.exchange(
                 "https://discord.com/api/v10/channels/1120568025993715764/messages",
                 HttpMethod.GET,
                 requestEntity,
-                JSONObject.class
+                String.class
         ).getBody();
         log.info("响应成功：{}",response);
         return R.ok().put(response);

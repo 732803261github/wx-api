@@ -26,6 +26,7 @@ public class MidJourneyController {
     @RequestMapping(value = "/json")
     public R retrieve_messages(){
         Map<String, String> map = new HashMap<>();
+        map.put("limit","20");
         HttpHeaders header = new HttpHeaders();
         header.set("authorization",String.valueOf(redisTemplate.opsForValue().get("authorization")));
         HttpEntity<Map<String, String>> httpEntity = new HttpEntity<>(map, header);

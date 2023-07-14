@@ -26,7 +26,6 @@ public class MjController {
     public R retrieve_messages(){
         log.info("token:{}",redisTemplate.opsForValue().get("authorization"));
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("authorization",String.valueOf(redisTemplate.opsForValue().get("authorization")));
         HttpEntity requestEntity = new HttpEntity(headers);
         JSONObject response = restTemplate.exchange(

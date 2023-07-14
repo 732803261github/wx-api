@@ -24,9 +24,10 @@ public class MidJourneyController {
 
     RestTemplate restTemplate = new RestTemplate();
 
-    @RequestMapping(value = "/json")
+    @RequestMapping(value = "/data")
     public R retrieve_messages(){
         HttpHeaders headers = new HttpHeaders();
+        System.out.println(redisTemplate.opsForValue().get("authorization"));
         log.info("token:{}",redisTemplate.opsForValue().get("authorization"));
         headers.set("authorization",String.valueOf(redisTemplate.opsForValue().get("authorization")));
         HttpEntity requestEntity = new HttpEntity(headers);

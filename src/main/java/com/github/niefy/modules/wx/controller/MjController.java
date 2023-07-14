@@ -27,19 +27,19 @@ public class MjController {
 
     @GetMapping(value = "/data")
     public R retrieve_messages() {
-        log.info("token:{}", redisTemplate.opsForValue().get("authorization"));
         HttpHeaders headers = new HttpHeaders();
         headers.set("authorization", String.valueOf(redisTemplate.opsForValue().get("authorization")));
         Map<String, Object> map = new HashMap<>();
-        map.put("limit", 20);
+        map.put("limit", 5);
         HttpEntity requestEntity = new HttpEntity(map, headers);
         String response = restTemplate.exchange(
-                "https://discord.com/api/v10/channels/1120568025993715764/messages?limit=10",
+                "https://discord.com/api/v10/channels/1120568025993715764/messages",
                 HttpMethod.GET,
                 requestEntity,
                 String.class
         ).getBody();
-        JSON json = JSON.parseObject(response).getJSONArray("data");
-        return R.ok().put(json);
+        log.info("res:{}",response);
+//        JSON json = JSON.parseObject(response).getJSONArray("data");
+        return R.ok().put(response);
     }
 }

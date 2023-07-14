@@ -1,6 +1,7 @@
 package com.github.niefy.modules.wx.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.niefy.common.utils.R;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +31,7 @@ public class MjController {
         HttpHeaders headers = new HttpHeaders();
         headers.set("authorization", String.valueOf(redisTemplate.opsForValue().get("authorization")));
         Map<String, Object> map = new HashMap<>();
-        map.put("limit", 5);
+        map.put("limit", 10);
         HttpEntity requestEntity = new HttpEntity(map, headers);
         String response = restTemplate.exchange(
                 "https://discord.com/api/v10/channels/1120568025993715764/messages",
@@ -38,7 +39,7 @@ public class MjController {
                 requestEntity,
                 String.class
         ).getBody();
-//        JSON json = JSON.parseObject(response).getJSONArray("data");
-        return R.ok().put(response);
+        JSONArray data = JSON.parseObject(response).getJSONArray("data");
+        return R.ok().put(data);
     }
 }

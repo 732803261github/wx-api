@@ -31,7 +31,7 @@ public class MidJourneyController {
         headers.set("authorization",String.valueOf(redisTemplate.opsForValue().get("authorization")));
         HttpEntity requestEntity = new HttpEntity(map,headers);
         JSONObject response = restTemplate.exchange(
-                "https://discord.com/api/v10/channels/1120568025993715764/messages?limit=10",
+                "https://discord.com/api/v10/channels/1120568025381355652/messages?limit=10",
                 HttpMethod.GET,
                 requestEntity,
                 JSONObject.class

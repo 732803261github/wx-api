@@ -29,7 +29,7 @@ public class MidJourneyController {
         HttpHeaders header = new HttpHeaders();
         header.set("authorization",String.valueOf(redisTemplate.opsForValue().get("authorization")));
         HttpEntity<Map<String, String>> httpEntity = new HttpEntity<>(map, header);
-        String url = String.format("https://discord.com/api/v10/channels/1120568025993715764/messages?limit=%s",10);
+        String url = String.format("https://discord.com/api/v10/channels/1120568025993715764/messages?limit=%d",10);
         JSONObject response = restTemplate.postForObject(url, httpEntity, JSONObject.class);
         log.info("响应成功：{}",response);
         return R.ok().put(response);

@@ -212,4 +212,8 @@ public class WxApiController {
             System.out.println(e);
         }
     }
+    @GetMapping(value = "/data2")
+    public String test(){
+        return "hello admin";
+    }
 }

@@ -15,7 +15,7 @@ import org.springframework.web.client.RestTemplate;
 
 @Slf4j
 @RestController
-public class WxMidController {
+public class MjController {
 
     @Autowired
     private RedisTemplate redisTemplate;
@@ -38,9 +38,4 @@ public class WxMidController {
         log.info("响应成功：{}",response);
         return R.ok().put(response);
     }
-    @GetMapping(value = "/data2")
-    public String test(){
-        return "hello admin";
-    }
-
 }

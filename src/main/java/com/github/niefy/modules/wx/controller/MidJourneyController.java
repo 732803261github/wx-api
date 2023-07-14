@@ -26,12 +26,11 @@ public class MidJourneyController {
 
     @RequestMapping(value = "/json")
     public R retrieve_messages(){
-        Map<String, String> map = new HashMap<>();
         HttpHeaders headers = new HttpHeaders();
         headers.set("authorization",String.valueOf(redisTemplate.opsForValue().get("authorization")));
-        HttpEntity requestEntity = new HttpEntity(map,headers);
+        HttpEntity requestEntity = new HttpEntity(headers);
         JSONObject response = restTemplate.exchange(
-                "https://discord.com/api/v10/channels/1120568025993715764/messages?limit=10",
+                "https://discord.com/api/v10/channels/1120568025993715764/messages",
                 HttpMethod.GET,
                 requestEntity,
                 JSONObject.class

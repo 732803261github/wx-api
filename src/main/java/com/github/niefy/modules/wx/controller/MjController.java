@@ -38,7 +38,6 @@ public class MjController {
                 requestEntity,
                 String.class
         ).getBody();
-        log.info("res:{}",response);
 //        JSON json = JSON.parseObject(response).getJSONArray("data");
         return R.ok().put(response);
     }

@@ -1,5 +1,6 @@
 package com.github.niefy.modules.wx.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.niefy.common.utils.R;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +12,9 @@ import org.springframework.http.HttpMethod;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -28,12 +32,17 @@ public class MjController {
         headers.set("authorization", String.valueOf(redisTemplate.opsForValue().get("authorization")));
         HttpEntity requestEntity = new HttpEntity(headers);
         String response = restTemplate.exchange(
-                "https://discord.com/api/v10/channels/1120568025993715764/messages",
+                "https://discord.com/api/v10/channels/1120568025993715764/messages?limit=10",
                 HttpMethod.GET,
                 requestEntity,
                 String.class
         ).getBody();
+        JSONObject jsonObject = JSON.parseObject(response);
         log.info("响应成功：{}",response);
         return R.ok().put(response);
+    }
+
+    public static void main(String[] args) {
+        String s = "";
     }
 }

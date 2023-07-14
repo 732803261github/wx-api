@@ -27,7 +27,7 @@ public class MjController {
     RestTemplate restTemplate = new RestTemplate();
 
     @GetMapping(value = "/data")
-    public R retrieve_messages() {
+    public String retrieve_messages() {
         HttpHeaders headers = new HttpHeaders();
         headers.set("authorization", String.valueOf(redisTemplate.opsForValue().get("authorization")));
         Map<String, Object> map = new HashMap<>();
@@ -39,7 +39,6 @@ public class MjController {
                 requestEntity,
                 String.class
         ).getBody();
-        JSONObject data = JSON.parseObject(response);
-        return R.ok().put(data);
+        return response;
     }
 }

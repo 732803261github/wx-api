@@ -26,11 +26,11 @@ public class MidJourneyController {
     @RequestMapping(value = "/json")
     public R retrieve_messages(){
         Map<String, String> map = new HashMap<>();
-        map.put("limit","20");
         HttpHeaders header = new HttpHeaders();
         header.set("authorization",String.valueOf(redisTemplate.opsForValue().get("authorization")));
         HttpEntity<Map<String, String>> httpEntity = new HttpEntity<>(map, header);
-        JSONObject response = restTemplate.postForObject("https://discord.com/api/v10/channels/1120568025993715764/messages", httpEntity, JSONObject.class);
+        String url = String.format("https://discord.com/api/v10/channels/1120568025993715764/messages?limit=%s",10);
+        JSONObject response = restTemplate.postForObject(url, httpEntity, JSONObject.class);
         log.info("响应成功：{}",response);
         return R.ok().put(response);
     }

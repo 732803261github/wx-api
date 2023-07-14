@@ -28,8 +28,8 @@ public class MidJourneyController {
     public R retrieve_messages(){
         HttpHeaders headers = new HttpHeaders();
         System.out.println(redisTemplate.opsForValue().get("authorization"));
-        log.info("token:{}",redisTemplate.opsForValue().get("authorization"));
-        headers.set("authorization",String.valueOf(redisTemplate.opsForValue().get("authorization")));
+        log.error("token:{}",redisTemplate.opsForValue().get("authorization"));
+        headers.add("authorization",String.valueOf(redisTemplate.opsForValue().get("authorization")));
         HttpEntity requestEntity = new HttpEntity(headers);
         JSONObject response = restTemplate.exchange(
                 "https://discord.com/api/v10/channels/1120568025993715764/messages",

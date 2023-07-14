@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
@@ -26,11 +27,14 @@ public class MidJourneyController {
     @RequestMapping(value = "/json")
     public R retrieve_messages(){
         Map<String, String> map = new HashMap<>();
-        HttpHeaders header = new HttpHeaders();
-        header.set("authorization",String.valueOf(redisTemplate.opsForValue().get("authorization")));
-        HttpEntity<Map<String, String>> httpEntity = new HttpEntity<>(map, header);
-        String url = String.format("https://discord.com/api/v10/channels/1120568025993715764/messages?limit=%d",10);
-        JSONObject response = restTemplate.postForObject(url, httpEntity, JSONObject.class);
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("authorization",String.valueOf(redisTemplate.opsForValue().get("authorization")));
+        String response = restTemplate.exchange(
+                "https://discord.com/api/v10/channels/1120568025993715764/messages?limit=10",
+                HttpMethod.GET,
+                new HttpEntity<>(headers),
+                String.class
+        ).getBody();
         log.info("响应成功：{}",response);
         return R.ok().put(response);
     }

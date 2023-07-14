@@ -26,23 +26,20 @@ public class MjController {
     RestTemplate restTemplate = new RestTemplate();
 
     @GetMapping(value = "/data")
-    public R retrieve_messages(){
-        log.info("token:{}",redisTemplate.opsForValue().get("authorization"));
+    public R retrieve_messages() {
+        log.info("token:{}", redisTemplate.opsForValue().get("authorization"));
         HttpHeaders headers = new HttpHeaders();
         headers.set("authorization", String.valueOf(redisTemplate.opsForValue().get("authorization")));
-        HttpEntity requestEntity = new HttpEntity(headers);
+        Map<String, Object> map = new HashMap<>();
+        map.put("limit", 20);
+        HttpEntity requestEntity = new HttpEntity(map, headers);
         String response = restTemplate.exchange(
                 "https://discord.com/api/v10/channels/1120568025993715764/messages?limit=10",
                 HttpMethod.GET,
                 requestEntity,
                 String.class
         ).getBody();
-        JSONObject jsonObject = JSON.parseObject(response);
-        log.info("响应成功：{}",response);
-        return R.ok().put(response);
-    }
-
-    public static void main(String[] args) {
-        String s = "";
+        JSON json = JSON.parseObject(response).getJSONArray("data");
+        return R.ok().put(json);
     }
 }

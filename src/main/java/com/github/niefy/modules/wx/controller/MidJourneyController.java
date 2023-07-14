@@ -29,11 +29,12 @@ public class MidJourneyController {
         Map<String, String> map = new HashMap<>();
         HttpHeaders headers = new HttpHeaders();
         headers.set("authorization",String.valueOf(redisTemplate.opsForValue().get("authorization")));
-        String response = restTemplate.exchange(
+        HttpEntity requestEntity = new HttpEntity(map,headers);
+        JSONObject response = restTemplate.exchange(
                 "https://discord.com/api/v10/channels/1120568025993715764/messages?limit=10",
                 HttpMethod.GET,
-                new HttpEntity<>(headers),
-                String.class
+                requestEntity,
+                JSONObject.class
         ).getBody();
         log.info("响应成功：{}",response);
         return R.ok().put(response);

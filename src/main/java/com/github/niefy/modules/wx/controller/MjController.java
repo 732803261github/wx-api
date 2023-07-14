@@ -31,7 +31,7 @@ public class MjController {
         HttpHeaders headers = new HttpHeaders();
         headers.set("authorization", String.valueOf(redisTemplate.opsForValue().get("authorization")));
         Map<String, Object> map = new HashMap<>();
-        map.put("limit", 10);
+        map.put("limit", 5);
         HttpEntity requestEntity = new HttpEntity(map, headers);
         String response = restTemplate.exchange(
                 "https://discord.com/api/v10/channels/1120568025993715764/messages",
@@ -39,7 +39,7 @@ public class MjController {
                 requestEntity,
                 String.class
         ).getBody();
-        JSONArray data = JSON.parseObject(response).getJSONArray("data");
+        JSONObject data = JSON.parseObject(response);
         return R.ok().put(data);
     }
 }

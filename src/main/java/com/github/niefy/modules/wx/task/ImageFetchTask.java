@@ -18,8 +18,7 @@ import java.util.Map;
 @Component
 public class ImageFetchTask {
 
-    @Autowired
-    private RedisTemplate redisTemplate;
+    RedisTemplate redisTemplate = new RedisTemplate();
 
     RestTemplate restTemplate = new RestTemplate();
 

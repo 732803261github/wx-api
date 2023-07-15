@@ -3,6 +3,7 @@ package com.github.niefy.modules.wx.task;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.github.niefy.config.RedisConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpEntity;
@@ -18,14 +19,11 @@ import java.util.Map;
 @Component
 public class ImageFetchTask {
 
-    RedisTemplate redisTemplate = new RedisTemplate();
-
-    RestTemplate restTemplate = new RestTemplate();
-
-    private final String authorization = String.valueOf(redisTemplate.opsForValue().get("authorization"));
-
-    @Scheduled(cron = "* */1 * * * ?")
+    @Scheduled(cron = "0 0/1 * * * ?")
     public void getImg() {
+        RedisTemplate redisTemplate = new RedisTemplate<>();
+        RestTemplate restTemplate = new RestTemplate();
+        String authorization = String.valueOf(redisTemplate.opsForValue().get("authorization"));
         HttpHeaders headers = new HttpHeaders();
         headers.set("authorization", authorization);
         Map<String, Object> map = new HashMap<>();

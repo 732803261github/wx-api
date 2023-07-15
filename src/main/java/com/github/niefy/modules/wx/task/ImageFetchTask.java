@@ -30,7 +30,7 @@ public class ImageFetchTask {
     @Scheduled(cron = "0 0/1 * * * ?")
     public void getImg() {
         String lastId = String.valueOf(redisTemplate.opsForValue().get("lastId"));
-        log.info("开始定时任务,上次任务id:{}", lastId);
+        log.info("开始定时任务,上次任务ID:{}", lastId);
         String authorization = String.valueOf(redisTemplate.opsForValue().get("authorization"));
         HttpHeaders headers = new HttpHeaders();
         headers.set("authorization", authorization);

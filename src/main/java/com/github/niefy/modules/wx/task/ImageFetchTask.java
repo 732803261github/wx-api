@@ -27,7 +27,7 @@ public class ImageFetchTask {
     RestTemplate restTemplate = new RestTemplate();
 
 //    @Scheduled(cron = "0 0/1 * * * ?")
-    @Scheduled(cron = "0/30 * * * * ?")
+    @Scheduled(cron = "0/15 * * * * ?")
     public void getImg() {
         String lastId = String.valueOf(redisTemplate.opsForValue().get("lastId"));
         log.info("开始定时任务,上次任务ID:{}", lastId);
@@ -49,9 +49,8 @@ public class ImageFetchTask {
             String nextId = ((JSONObject) objects.get(0)).getString("id");
             if (!"null".equals(lastId)) {
                 redisTemplate.delete(lastId);
-            } else {
-                redisTemplate.opsForValue().set("lastId", nextId, 1, TimeUnit.DAYS);
             }
+            redisTemplate.opsForValue().set("lastId", nextId, 1, TimeUnit.DAYS);
             for (Object object : objects) {
                 for (Object attachments : ((JSONObject) object).getJSONArray("attachments")) {
                     String taskid = ((JSONObject) object).getString("content").split("]")[0].substring(3);

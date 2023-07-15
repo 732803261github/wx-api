@@ -66,6 +66,7 @@ public class ImageFetchTask {
                 }
             }
         }else {
+            log.info("循环结束，从最新任务开始获取");
             redisTemplate.delete("lastId");
         }
     }

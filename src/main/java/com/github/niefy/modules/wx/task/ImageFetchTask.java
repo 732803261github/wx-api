@@ -45,13 +45,11 @@ public class ImageFetchTask {
         JSONArray objects = JSON.parseArray(response);
         if (objects.size() > 0) {
             String nextId = ((JSONObject) objects.get(objects.size() - 1)).getString("id");
+            if (!"null".equals(lastId)) {
+                redisTemplate.delete(lastId);
+            }
             redisTemplate.opsForValue().set("lastId", nextId, 1, TimeUnit.DAYS);
             for (Object object : objects) {
-                if (lastId.equals(nextId)) {
-                    redisTemplate.delete("lastId");
-                    log.info("循环结束，从最新开始");
-                    break;
-                }
                 for (Object attachments : ((JSONObject) object).getJSONArray("attachments")) {
                     String taskid = ((JSONObject) object).getString("content").split("]")[0].substring(3);
                     boolean isNumeric = taskid.matches("\\d+");
@@ -65,7 +63,7 @@ public class ImageFetchTask {
                     }
                 }
             }
-        }else {
+        } else {
             log.info("循环结束，从最新任务开始获取");
             redisTemplate.delete("lastId");
         }

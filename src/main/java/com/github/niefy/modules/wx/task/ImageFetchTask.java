@@ -30,14 +30,13 @@ public class ImageFetchTask {
     @Scheduled(cron = "0/15 * * * * ?")
     public void getImg() {
         String lastId = String.valueOf(redisTemplate.opsForValue().get("lastId"));
-        log.info("开始定时任务,上次任务ID:{}", lastId);
         String authorization = String.valueOf(redisTemplate.opsForValue().get("authorization"));
         HttpHeaders headers = new HttpHeaders();
         headers.set("authorization", authorization);
         Map<String, Object> map = new HashMap<>();
         HttpEntity requestEntity = new HttpEntity(map, headers);
         String api = "https://discord.com/api/v9/channels/1120568025993715764/messages?limit=50" + (!"null".equals(lastId) ? "&before=" + lastId : "");
-        log.info("请求API:{}",api);
+        log.info("请求api:{}",api);
         String response = restTemplate.exchange(
                 api,
                 HttpMethod.GET,
@@ -46,7 +45,7 @@ public class ImageFetchTask {
         ).getBody();
         JSONArray objects = JSON.parseArray(response);
         if(objects.size()>0){
-            String nextId = ((JSONObject) objects.get(0)).getString("id");
+            String nextId = ((JSONObject) objects.get(objects.size()-1)).getString("id");
             if (!"null".equals(lastId)) {
                 redisTemplate.delete(lastId);
             }
@@ -61,7 +60,7 @@ public class ImageFetchTask {
                         String url = replace + "?Authorization=9998@xunshu";
                         redisTemplate.opsForValue().setIfAbsent(taskid, url, 30, TimeUnit.DAYS);
                     } else {
-                        log.info("非前端生成，跳过存储");
+                        log.info("非前端生成，跳过存储:{}",((JSONObject) object).getString("content"));
                     }
                 }
             }

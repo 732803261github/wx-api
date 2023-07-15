@@ -48,7 +48,7 @@ public class ImageFetchTask {
             if (!"null".equals(lastId)) {
                 redisTemplate.delete(lastId);
             }
-            redisTemplate.opsForValue().set("lastId", nextId, 360, TimeUnit.SECONDS);
+            redisTemplate.opsForValue().set("lastId", nextId, 3600, TimeUnit.SECONDS);
             for (Object object : objects) {
                 for (Object attachments : ((JSONObject) object).getJSONArray("attachments")) {
                     String taskid = ((JSONObject) object).getString("content").split("]")[0].substring(3);
@@ -58,9 +58,7 @@ public class ImageFetchTask {
                         String replace = string.replace("https://media.discordapp.net", "http://www.ai-assistant.com.cn/api/cnd-discordapp");
                         String url = replace + "?Authorization=9998@xunshu";
                         redisTemplate.opsForValue().getAndDelete(taskid);
-                        redisTemplate.opsForValue().set(taskid, url, 360, TimeUnit.SECONDS);
-                    } else {
-                        log.info("非前端生成，跳过存储:{}", ((JSONObject) object).getString("content"));
+                        redisTemplate.opsForValue().set(taskid, url, 3600, TimeUnit.SECONDS);
                     }
                 }
             }

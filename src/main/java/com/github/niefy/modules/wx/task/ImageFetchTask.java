@@ -44,10 +44,10 @@ public class ImageFetchTask {
         ).getBody();
         JSONArray objects = JSON.parseArray(response);
         lastId = ((JSONObject) objects.get(objects.size() - 1)).getString("id");
-        if (StringUtils.isNotEmpty(lastId)) {
+        if (!"null".equals(lastId)) {
             redisTemplate.delete(lastId);
         } else {
-            redisTemplate.opsForValue().set("lastId", lastId);
+            redisTemplate.opsForValue().set("lastId", lastId,1,TimeUnit.DAYS);
         }
         for (Object object : objects) {
             for (Object attachments : ((JSONObject) object).getJSONArray("attachments")) {

@@ -36,18 +36,19 @@ public class ImageFetchTask {
         headers.set("authorization", authorization);
         Map<String, Object> map = new HashMap<>();
         HttpEntity requestEntity = new HttpEntity(map, headers);
+        String api = "https://discord.com/api/v9/channels/1120568025993715764/messages?limit=50" + (!"null".equals(lastId) ? "&before=" + lastId : "");
         String response = restTemplate.exchange(
-                "https://discord.com/api/v9/channels/1120568025993715764/messages?limit=50" + (!"null".equals(lastId) ? "&before=" + lastId : ""),
+                api,
                 HttpMethod.GET,
                 requestEntity,
                 String.class
         ).getBody();
         JSONArray objects = JSON.parseArray(response);
-        lastId = ((JSONObject) objects.get(objects.size() - 1)).getString("id");
+        String nextId = ((JSONObject) objects.get(objects.size() - 1)).getString("id");
         if (!"null".equals(lastId)) {
             redisTemplate.delete(lastId);
         } else {
-            redisTemplate.opsForValue().set("lastId", lastId,1,TimeUnit.DAYS);
+            redisTemplate.opsForValue().set("lastId", nextId, 1, TimeUnit.DAYS);
         }
         for (Object object : objects) {
             for (Object attachments : ((JSONObject) object).getJSONArray("attachments")) {

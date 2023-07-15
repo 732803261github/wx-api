@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpEntity;
@@ -27,7 +26,7 @@ public class ImageFetchTask {
 
     RestTemplate restTemplate = new RestTemplate();
 
-    @Scheduled(cron = "0 0/1 * * * ?")
+    @Scheduled(cron = "* 0/1 * * * ?")
     public void getImg() {
         String lastId = String.valueOf(redisTemplate.opsForValue().get("lastId"));
         log.info("开始定时任务,上次任务ID:{}", lastId);
@@ -53,10 +52,15 @@ public class ImageFetchTask {
         for (Object object : objects) {
             for (Object attachments : ((JSONObject) object).getJSONArray("attachments")) {
                 String taskid = ((JSONObject) object).getString("content").split("]")[0].substring(3);
-                String string = ((JSONObject) attachments).getString("proxy_url");
-                String replace = string.replace("https://media.discordapp.net", "http://www.ai-assistant.com.cn/api/cnd-discordapp");
-                String url = replace + "?Authorization=9998@xunshu";
-                redisTemplate.opsForValue().setIfAbsent(taskid, url, 30, TimeUnit.DAYS);
+                boolean isNumeric = taskid.matches("\\d+");
+                if (isNumeric) {
+                    String string = ((JSONObject) attachments).getString("proxy_url");
+                    String replace = string.replace("https://media.discordapp.net", "http://www.ai-assistant.com.cn/api/cnd-discordapp");
+                    String url = replace + "?Authorization=9998@xunshu";
+                    redisTemplate.opsForValue().setIfAbsent(taskid, url, 30, TimeUnit.DAYS);
+                } else {
+                    log.info("非前端生成，跳过存储");
+                }
             }
         }
     }

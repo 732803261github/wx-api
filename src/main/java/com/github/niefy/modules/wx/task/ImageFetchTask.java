@@ -26,8 +26,7 @@ public class ImageFetchTask {
 
     RestTemplate restTemplate = new RestTemplate();
 
-//    @Scheduled(cron = "0 0/1 * * * ?")
-    @Scheduled(cron = "0/15 * * * * ?")
+    @Scheduled(cron = "0 0/9 * * * ?")
     public void getImg() {
         String lastId = String.valueOf(redisTemplate.opsForValue().get("lastId"));
         String authorization = String.valueOf(redisTemplate.opsForValue().get("authorization"));

@@ -26,7 +26,8 @@ public class ImageFetchTask {
 
     RestTemplate restTemplate = new RestTemplate();
 
-    @Scheduled(cron = "0 0/1 * * * ?")
+//    @Scheduled(cron = "0 0/1 * * * ?")
+    @Scheduled(cron = "0/30 * * * * ?")
     public void getImg() {
         String lastId = String.valueOf(redisTemplate.opsForValue().get("lastId"));
         log.info("开始定时任务,上次任务ID:{}", lastId);
@@ -36,6 +37,7 @@ public class ImageFetchTask {
         Map<String, Object> map = new HashMap<>();
         HttpEntity requestEntity = new HttpEntity(map, headers);
         String api = "https://discord.com/api/v9/channels/1120568025993715764/messages?limit=50" + (!"null".equals(lastId) ? "&before=" + lastId : "");
+        log.info("请求API:{}",api);
         String response = restTemplate.exchange(
                 api,
                 HttpMethod.GET,
@@ -54,7 +56,6 @@ public class ImageFetchTask {
                 for (Object attachments : ((JSONObject) object).getJSONArray("attachments")) {
                     String taskid = ((JSONObject) object).getString("content").split("]")[0].substring(3);
                     boolean isNumeric = taskid.matches("\\d+");
-                    log.info("taskid:{},{}",taskid,isNumeric);
                     if (isNumeric) {
                         String string = ((JSONObject) attachments).getString("proxy_url");
                         String replace = string.replace("https://media.discordapp.net", "http://www.ai-assistant.com.cn/api/cnd-discordapp");

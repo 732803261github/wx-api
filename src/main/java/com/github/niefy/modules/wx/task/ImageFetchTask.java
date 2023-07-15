@@ -3,8 +3,7 @@ package com.github.niefy.modules.wx.task;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.github.niefy.config.RedisConfig;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -17,10 +16,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Component
+@Slf4j
 public class ImageFetchTask {
 
     @Scheduled(cron = "0 0/1 * * * ?")
     public void getImg() {
+        log.info("开始定时任务");
         RedisTemplate redisTemplate = new RedisTemplate<>();
         RestTemplate restTemplate = new RestTemplate();
         String authorization = String.valueOf(redisTemplate.opsForValue().get("authorization"));
@@ -35,6 +36,7 @@ public class ImageFetchTask {
                 String.class
         ).getBody();
         JSONArray objects = JSON.parseArray(response);
+        log.info("objects:{}", objects);
         for (Object object : objects) {
             for (Object attachments : ((JSONObject) object).getJSONArray("attachments")) {
                 String taskid = ((JSONObject) object).getString("content").split("]")[0].substring(3);

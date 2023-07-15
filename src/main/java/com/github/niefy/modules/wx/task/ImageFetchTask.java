@@ -37,7 +37,7 @@ public class ImageFetchTask {
         Map<String, Object> map = new HashMap<>();
         HttpEntity requestEntity = new HttpEntity(map, headers);
         String response = restTemplate.exchange(
-                "https://discord.com/api/v9/channels/1120568025993715764/messages?limit=50" + (StringUtils.isNotEmpty(lastId) ? "&before=" + lastId : ""),
+                "https://discord.com/api/v9/channels/1120568025993715764/messages?limit=50" + (!"null".equals(lastId) ? "&before=" + lastId : ""),
                 HttpMethod.GET,
                 requestEntity,
                 String.class

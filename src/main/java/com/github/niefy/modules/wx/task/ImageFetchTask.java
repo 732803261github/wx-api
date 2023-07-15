@@ -26,7 +26,7 @@ public class ImageFetchTask {
 
     RestTemplate restTemplate = new RestTemplate();
 
-    @Scheduled(cron = "0/59 * * * * ?")
+    @Scheduled(cron = "0/10 * * * * ?")
     public void getImg() {
         String lastId = String.valueOf(redisTemplate.opsForValue().get("lastId"));
         String authorization = String.valueOf(redisTemplate.opsForValue().get("authorization"));
@@ -48,7 +48,7 @@ public class ImageFetchTask {
             if (!"null".equals(lastId)) {
                 redisTemplate.delete(lastId);
             }
-            redisTemplate.opsForValue().set("lastId", nextId, 1, TimeUnit.DAYS);
+            redisTemplate.opsForValue().set("lastId", nextId, 360, TimeUnit.SECONDS);
             for (Object object : objects) {
                 for (Object attachments : ((JSONObject) object).getJSONArray("attachments")) {
                     String taskid = ((JSONObject) object).getString("content").split("]")[0].substring(3);
@@ -57,7 +57,8 @@ public class ImageFetchTask {
                         String string = ((JSONObject) attachments).getString("proxy_url");
                         String replace = string.replace("https://media.discordapp.net", "http://www.ai-assistant.com.cn/api/cnd-discordapp");
                         String url = replace + "?Authorization=9998@xunshu";
-                        redisTemplate.opsForValue().setIfAbsent(taskid, url, 30, TimeUnit.DAYS);
+                        redisTemplate.opsForValue().getAndDelete(taskid);
+                        redisTemplate.opsForValue().set(taskid, url, 360, TimeUnit.SECONDS);
                     } else {
                         log.info("非前端生成，跳过存储:{}", ((JSONObject) object).getString("content"));
                     }

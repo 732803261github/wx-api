@@ -33,10 +33,9 @@ public class MjController {
         HttpHeaders headers = new HttpHeaders();
         headers.set("authorization", String.valueOf(redisTemplate.opsForValue().get("authorization")));
         Map<String, Object> map = new HashMap<>();
-        map.put("limit", 10);
         HttpEntity requestEntity = new HttpEntity(map, headers);
         String response = restTemplate.exchange(
-                "https://discord.com/api/v9/channels/1120568025993715764/messages",
+                "https://discord.com/api/v9/channels/1120568025993715764/messages?limit=20",
                 HttpMethod.GET,
                 requestEntity,
                 String.class
@@ -53,6 +52,12 @@ public class MjController {
             }
         }
         return R.ok().put(list);
+    }
+
+    @GetMapping(value = "/getImg")
+    public R getImg(String taskId){
+        String s = String.valueOf(redisTemplate.opsForValue().get(taskId));
+        return R.ok().put(s);
     }
 
     public static void main(String[] args) {

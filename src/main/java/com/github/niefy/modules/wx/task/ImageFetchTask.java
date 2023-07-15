@@ -45,12 +45,14 @@ public class ImageFetchTask {
         JSONArray objects = JSON.parseArray(response);
         if (objects.size() > 0) {
             String nextId = ((JSONObject) objects.get(objects.size() - 1)).getString("id");
+            log.info("nextId:{},lastId=nextId:{}",nextId,lastId.equals(nextId));
             if (!"null".equals(lastId)) {
                 redisTemplate.delete(lastId);
             }
             redisTemplate.opsForValue().set("lastId", nextId, 1, TimeUnit.DAYS);
             for (Object object : objects) {
                 if (lastId.equals(nextId)) {
+                    redisTemplate.delete("lastId");
                     log.info("循环结束，从最新开始");
                     break;
                 }

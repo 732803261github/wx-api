@@ -3,10 +3,12 @@ package com.github.niefy.modules.wx.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.niefy.common.utils.Constant;
+import com.github.niefy.common.utils.DateUtils;
 import com.github.niefy.common.utils.R;
 import com.github.niefy.common.utils.SHA1Util;
 import com.github.niefy.modules.wx.entity.WxAccount;
 import com.github.niefy.modules.wx.entity.WxUser;
+import com.github.niefy.modules.wx.service.TemplateMsgService;
 import com.github.niefy.modules.wx.service.WxAccountService;
 import com.github.niefy.modules.wx.service.WxUserService;
 import io.swagger.annotations.ApiOperation;
@@ -14,6 +16,9 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.error.WxErrorException;
 import me.chanjar.weixin.mp.api.WxMpService;
+import me.chanjar.weixin.mp.bean.template.WxMpTemplateData;
+import me.chanjar.weixin.mp.bean.template.WxMpTemplateMessage;
+import me.chanjar.weixin.mp.util.WxMpConfigStorageHolder;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +52,8 @@ public class WxApiController {
     private WxUserService userService;
     @Autowired
     private WxMpService wxMpService;
+    @Autowired
+    private TemplateMsgService templateMsgService;
 
 
     RestTemplate restTemplate = new RestTemplate();
@@ -211,5 +218,21 @@ public class WxApiController {
         } catch (IOException e) {
             System.out.println(e);
         }
+    }
+
+    @RequestMapping(value = "/infoSend")
+    void sendTemplateMsg() {
+        String appid = "wx0f791e273d673f03";
+        List<WxMpTemplateData> data  = new ArrayList<>();
+        data.add(new WxMpTemplateData("thing1","白天鹅，在湖里，捕鱼","red"));
+        data.add(new WxMpTemplateData("character_string2","3878599093670556"));
+        data.add(new WxMpTemplateData("time3", DateUtils.format(new Date(),"yyyy-MM-dd HH:mm")));
+        WxMpTemplateMessage wxMpTemplateMessage = WxMpTemplateMessage.builder()
+                .templateId("K_WOhj5KoEgBc7MomCHL48SGptwWr2uvvjwH9Zwv2Rg")
+                .url("http://ai-assistant.com.cn/api/cnd-discordapp/attachments/1120568025993715764/1129837389020414062/oliverdaniel_3878599093670556_Swans_fish_in_the_lake_during_the_4a97a352-a0ec-47c0-80a2-c6071031a23b.png?Authorization=9998@xunshu")
+                .toUser("o731S6QvW6NlhTkJyGYJNItsu9a8")
+                .data(data)
+                .build();
+        templateMsgService.sendTemplateMsg(wxMpTemplateMessage,appid);
     }
 }

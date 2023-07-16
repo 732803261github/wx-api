@@ -222,7 +222,7 @@ public class WxApiController {
 
     @RequestMapping(value = "/infoSend")
     void sendTemplateMsg() {
-        String appid = WxMpConfigStorageHolder.get();
+        String appid = String.valueOf(redisTemplate.opsForValue().get("appid"));
         List<WxMpTemplateData> data  = new ArrayList<>();
         data.add(new WxMpTemplateData("thing1","白天鹅，在湖里，捕鱼12121adnfakndfkdfkejrbqwjbfkcsdbfkadk那就看不见看吧的烦恼呐2388unnnn"));
         data.add(new WxMpTemplateData("character_string2","3878599093670556"));

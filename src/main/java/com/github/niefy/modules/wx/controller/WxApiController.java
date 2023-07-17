@@ -58,8 +58,8 @@ public class WxApiController {
 
     RestTemplate restTemplate = new RestTemplate();
 
-    String appId = "wxbf2afefa7dfefa54";
-    String secret = "061a3a89b17568868394680c89707d93";
+    String appId = redisTemplate.opsForValue().get("appid").toString();
+    String secret = redisTemplate.opsForValue().get("secret").toString();
 
     public R getWxToken() {
         String URL = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=" + appId + "&secret=" + secret;

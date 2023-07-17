@@ -91,7 +91,7 @@ public class WxApiController {
         return R.ok().put(state);
     }
 
-    @GetMapping(value = "/code2userinfo")
+    @GetMapping(value = "/auth2code")
     public R code2userinfo(HttpServletRequest request) {
         String code = request.getParameter("code");
         log.info("auth2code:{}", code);

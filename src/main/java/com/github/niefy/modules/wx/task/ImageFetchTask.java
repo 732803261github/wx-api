@@ -36,7 +36,6 @@ public class ImageFetchTask {
         Map<String, Object> map = new HashMap<>();
         HttpEntity requestEntity = new HttpEntity(map, headers);
         String api = "https://discord.com/api/v9/channels/1120568025993715764/messages?limit=50" + (!"null".equals(lastId) ? "&before=" + lastId : "");
-        log.info("请求api:{}", api);
         String response = restTemplate.exchange(
                 api,
                 HttpMethod.GET,
@@ -64,7 +63,6 @@ public class ImageFetchTask {
                 }
             }
         } else {
-            log.info("循环结束，从最新任务开始获取");
             redisTemplate.delete("lastId");
         }
     }

@@ -2,23 +2,16 @@ package com.github.niefy.modules.wx.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.github.niefy.common.utils.Constant;
 import com.github.niefy.common.utils.DateUtils;
 import com.github.niefy.common.utils.R;
-import com.github.niefy.common.utils.SHA1Util;
-import com.github.niefy.modules.wx.entity.WxAccount;
 import com.github.niefy.modules.wx.entity.WxUser;
 import com.github.niefy.modules.wx.service.TemplateMsgService;
 import com.github.niefy.modules.wx.service.WxAccountService;
 import com.github.niefy.modules.wx.service.WxUserService;
-import io.swagger.annotations.ApiOperation;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import me.chanjar.weixin.common.error.WxErrorException;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.template.WxMpTemplateData;
 import me.chanjar.weixin.mp.bean.template.WxMpTemplateMessage;
-import me.chanjar.weixin.mp.util.WxMpConfigStorageHolder;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +20,6 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -58,8 +50,8 @@ public class WxApiController {
 
     RestTemplate restTemplate = new RestTemplate();
 
-    String appId = redisTemplate.opsForValue().get("appid").toString();
-    String secret = redisTemplate.opsForValue().get("secret").toString();
+    String appId = "wx0f791e273d673f03";
+    String secret = "7a6b5600eb032829c6ac490a1d7bca50";
 
     public R getWxToken() {
         String URL = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=" + appId + "&secret=" + secret;

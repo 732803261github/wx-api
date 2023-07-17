@@ -87,7 +87,7 @@ public class WxApiController {
     @GetMapping(value = "/auth")
     public String oauth(HttpServletResponse response) throws IOException {
         String redirectUri = URLEncoder.encode("http://www.ai-assistant.com.cn/wx/auth2code", "UTF-8");
-        String authorizeUrl = String.format("https://open.weixin.qq.com/connect/oauth2/authorize?appid=%s&redirect_uri=%s&response_type=code&scope=snsapi_base&state=%s#wechat_redirect", appId, redirectUri, "state");
+        String authorizeUrl = String.format("https://open.weixin.qq.com/connect/oauth2/authorize?appid=%s&redirect_uri=%s&response_type=code&scope=snsapi_userinfo&state=%s#wechat_redirect", appId, redirectUri, "state");
         return authorizeUrl;
     }
 

@@ -50,10 +50,11 @@ public class WxApiController {
 
     RestTemplate restTemplate = new RestTemplate();
 
-    String appId = "wx0f791e273d673f03";
-    String secret = "7a6b5600eb032829c6ac490a1d7bca50";
+    public static final String appId = "wx0f791e273d673f03";
+    String secret = "";
 
     public String getWxToken() {
+        secret = redisTemplate.opsForValue().get("secret").toString();
         String URL = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=" + appId + "&secret=" + secret;
         if (redisTemplate.opsForValue().get("access_token") == null) {
             ResponseEntity<String> response = restTemplate.getForEntity(URL, String.class);
@@ -84,15 +85,13 @@ public class WxApiController {
         return R.error();
     }
 
-    public R oauth(HttpServletRequest request) throws IOException {
-        String state = UUID.randomUUID().toString();
-        String redirectUri = URLEncoder.encode("http://www.ai-assistant.com.cn/wx/auth2code", "UTF-8");
-        String authorizeUrl = String.format("https://open.weixin.qq.com/connect/oauth2/authorize?appid=%s&redirect_uri=%s&response_type=code&scope=snsapi_base&forcePopup=true&state=%s#wechat_redirect", appId, redirectUri, state);
-        return R.ok().put(state);
+    public static void main(String[] args) throws UnsupportedEncodingException {
+        System.out.println(String.format("https://open.weixin.qq.com/connect/oauth2/authorize?appid=%s&redirect_uri=%s&response_type=code&scope=snsapi_userinfo&forcePopup=true&state=%s#wechat_redirect", appId, URLEncoder.encode("http://www.ai-assistant.com.cn/wx/auth2code", "UTF-8"), "state"));
     }
 
     @GetMapping(value = "/auth2code")
     public R code2userinfo(HttpServletRequest request) {
+        secret = redisTemplate.opsForValue().get("secret").toString();
         String code = request.getParameter("code");
         log.info("auth2code:{}", code);
         String url = String.format("https://api.weixin.qq.com/sns/oauth2/access_token?appid=%s&secret=%s&code=%s&grant_type=authorization_code", appId, secret, code);

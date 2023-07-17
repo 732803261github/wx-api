@@ -61,14 +61,13 @@ public class WxApiController {
     String appId = "wxbf2afefa7dfefa54";
     String secret = "061a3a89b17568868394680c89707d93";
 
-    @GetMapping("/getWxToken")
     public R getWxToken() {
         String URL = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=" + appId + "&secret=" + secret;
         if (redisTemplate.opsForValue().get("wxtoken") == null) {
             ResponseEntity<String> response = restTemplate.getForEntity(URL, String.class);
             if (response.getStatusCodeValue() == 200) {
                 JSONObject jsonObject = JSON.parseObject(response.getBody());
-                redisTemplate.opsForValue().set("wxtoken", response.getBody(), 600, TimeUnit.SECONDS);
+                redisTemplate.opsForValue().set("wxtoken", response.getBody(), 3600, TimeUnit.SECONDS);
                 return R.ok().put(jsonObject);
             }
         } else {
@@ -78,75 +77,50 @@ public class WxApiController {
     }
 
 
-    @PostMapping("/check")
+    @PostMapping("/authInfo")
     public R checkUserSubscribe(String openid) {
-        String key = "checkSubscribe_" + openid;
+        String key = "authInfo::" + openid;
         if (redisTemplate.opsForValue().get(key) == null) {
             WxUser wxUser = userService.getById(openid);
             if (ObjectUtils.isNotEmpty(wxUser)) {
-                redisTemplate.opsForValue().set(key, wxUser, 60, TimeUnit.SECONDS);
+                redisTemplate.opsForValue().set(key, wxUser, 1, TimeUnit.HOURS);
                 return R.ok().put(wxUser);
             }
         } else {
             return R.ok().put(JSON.parseObject(redisTemplate.opsForValue().get(key).toString()));
         }
-        return R.ok();
+        return R.error();
     }
 
-    @GetMapping(value = "/oauth")
+    @GetMapping(value = "/auth")
     public String oauth(HttpServletResponse response) throws IOException {
-        String redirectUri = URLEncoder.encode("http://www.ai-assistant.com.cn/wx/invoke", "UTF-8");
+        String redirectUri = URLEncoder.encode("http://www.ai-assistant.com.cn/wx/auth2code", "UTF-8");
         String authorizeUrl = String.format("https://open.weixin.qq.com/connect/oauth2/authorize?appid=%s&redirect_uri=%s&response_type=code&scope=snsapi_base&state=%s#wechat_redirect", appId, redirectUri, "state");
         return authorizeUrl;
     }
 
-    @GetMapping(value = "/invoke")
+    @GetMapping(value = "/auth2code")
     public R invoke(HttpServletRequest request) throws UnsupportedEncodingException {
         String code = request.getParameter("code");
+        log.info("auth2code:{}",code);
         if(StringUtils.isNotEmpty(code)){
             return R.ok().put(code);
-        }else {
-            return R.error("授权失败");
         }
+        return R.error("授权失败");
     }
-
-    @GetMapping("/getSignature")
-    @ApiOperation(value = "获取微信分享的签名配置",notes = "微信公众号添加了js安全域名的网站才能加载微信分享")
-    public R getShareSignature(HttpServletRequest request,String appid) throws WxErrorException {
-        this.wxMpService.switchoverTo(appid);
-        Map<String, String> wxMap = new TreeMap<>();
-        String wxNoncestr = UUID.randomUUID().toString();
-        String wxTimestamp = (System.currentTimeMillis() / 1000) + "";
-        wxMap.put("noncestr", wxNoncestr);
-        wxMap.put("timestamp", wxTimestamp);
-        wxMap.put("jsapi_ticket", wxMpService.getJsapiTicket());
-        wxMap.put("url", "http://www.ai-assistant.com.cn");
-        // 加密获取signature
-        StringBuilder wxBaseString = new StringBuilder();
-        wxMap.forEach((key, value) -> wxBaseString.append(key).append("=").append(value).append("&"));
-        String wxSignString = wxBaseString.substring(0, wxBaseString.length() - 1);
-        // signature
-        String wxSignature = SHA1Util.sha1(wxSignString);
-        Map<String, String> resMap = new TreeMap<>();
-        resMap.put("appId", appid);
-        resMap.put("wxTimestamp", wxTimestamp);
-        resMap.put("wxNoncestr", wxNoncestr);
-        resMap.put("wxSignature", wxSignature);
-        return R.ok().put(resMap);
-    }
-    @GetMapping(value = "getuserInfo")
-    public R getuserInfo(String code){
+    @GetMapping(value = "code2userinfo")
+    public R code2userinfo(String code){
         String url = String.format("https://api.weixin.qq.com/sns/oauth2/access_token?appid=%s&secret=%s&code=%s&grant_type=authorization_code",appId,secret,code);
         ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
         if (response.getStatusCodeValue() == 200) {
             JSONObject jsonObject = JSON.parseObject(response.getBody());
-            log.info("jsonObject====" + jsonObject);
             String access_token = jsonObject.getString("access_token");
             String openid = jsonObject.getString("openid");
-            //第三步：拉取用户信息
+            //获取用户信息
             String userInfoUrl = String.format("https://api.weixin.qq.com/sns/userinfo?access_token=%s&openid=%s&lang=zh_CN",access_token,openid);
             ResponseEntity<String> response2 = restTemplate.getForEntity(userInfoUrl, String.class);
             JSONObject userJson = JSONObject.parseObject(response2.getBody());
+            log.info("openid为：{}的用户信息是：{}",openid,userJson);
             return R.ok().put(userJson);
         } else {
             return R.error("系统异常");

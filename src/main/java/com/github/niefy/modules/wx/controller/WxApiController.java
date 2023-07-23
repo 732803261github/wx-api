@@ -64,7 +64,7 @@ public class WxApiController {
                 return jsonObject.getString("access_token");
             }
         } else {
-            return redisTemplate.opsForValue().get("access_token").toString();
+            return JSONObject.parseObject(redisTemplate.opsForValue().get("access_token").toString()).getString("access_token");
         }
         return "";
     }
@@ -128,54 +128,23 @@ public class WxApiController {
 //    }
 
     @GetMapping(value = "/pcAuth")
-    public R pageAuth() throws UnsupportedEncodingException {
-        if (redisTemplate.opsForValue().get("qrcode") == null) {
-            String token = getWxToken();
-            String url = String.format("https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token=%s", token);
-            JSONObject jsonObject = JSON.parseObject("{\"action_name\": \"QR_LIMIT_SCENE\", \"action_info\": {\"scene\": {\"scene_id\": \"pcAuth\"}}}");
-            ResponseEntity<String> response = restTemplate.postForEntity(url, jsonObject, String.class);
-            if (response.getStatusCodeValue() == 200) {
-                JSONObject qrcode = JSONObject.parseObject(response.getBody());
-                if (StringUtils.isNotEmpty(qrcode.getString("ticket"))) {
-                    String tickUrl = String.format("https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=%s", URLEncoder.encode(qrcode.getString("ticket"), "UTF-8"));
-                    genQrcode(URLEncoder.encode(qrcode.getString("ticket"), "UTF-8"));
-                    ResponseEntity<String> responseEntity = restTemplate.getForEntity(tickUrl, String.class);
-                    redisTemplate.opsForValue().set("qrcode", responseEntity.getBody());
-                    return R.ok().put(responseEntity);
-
-                }
-            } else {
-                return R.error();
+    public String pageAuth() throws UnsupportedEncodingException {
+        String token = getWxToken();
+        double uuid = Math.random() * 1000000;
+        log.info("uuid:{}",uuid);
+        String url = String.format("https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token=%s", token);
+        JSONObject jsonObject = JSON.parseObject("{\"action_name\": \"QR_SCENE\", \"action_info\": {\"scene\": {\"scene_id\": " + uuid + "}}}");
+        ResponseEntity<String> response = restTemplate.postForEntity(url, jsonObject, String.class);
+        if (response.getStatusCodeValue() == 200) {
+            JSONObject qrcode = JSONObject.parseObject(response.getBody());
+            if (StringUtils.isNotEmpty(qrcode.getString("ticket"))) {
+                String tickUrl = String.format("https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=%s", URLEncoder.encode(qrcode.getString("ticket"), "UTF-8"));
+                return "redirect:" + tickUrl;
             }
-        } else {
-            return R.ok().put(redisTemplate.opsForValue().get("qrcode"));
+        }else {
+            return "error";
         }
-        return R.ok();
-    }
-
-    public void genQrcode(String ticket) {
-        URL url = null;
-        try {
-            //请求的路径
-            String qrUrl = "https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=" + ticket;
-            url = new URL(qrUrl);
-            DataInputStream dataInputStream = new DataInputStream(url.openStream());
-            FileOutputStream fileOutputStream = new FileOutputStream("/Users/chenxiaoming/Desktop/qrcode.jpg");//下载的位置及文件名
-            ByteArrayOutputStream output = new ByteArrayOutputStream();
-            byte[] buffer = new byte[1024];
-            int length;
-
-            while ((length = dataInputStream.read(buffer)) > 0) {
-                output.write(buffer, 0, length);
-            }
-            fileOutputStream.write(output.toByteArray());
-            dataInputStream.close();
-            fileOutputStream.close();
-        } catch (MalformedURLException e) {
-            System.out.println(e);
-        } catch (IOException e) {
-            System.out.println(e);
-        }
+        return "error";
     }
 
     @RequestMapping(value = "/infoSend")

@@ -130,7 +130,7 @@ public class WxApiController {
 //        return R.ok().put(userJson);
 //    }
 
-    @GetMapping(value = "/auth")
+    @GetMapping(value = "/gencode")
     public String pageAuth() throws UnsupportedEncodingException {
         String token = getWxToken();
         Random random = new Random();
@@ -141,6 +141,7 @@ public class WxApiController {
         String url = String.format("https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token=%s", token);
         JSONObject jsonObject = JSON.parseObject("{\"action_name\": \"QR_SCENE\", \"action_info\": {\"scene\": {\"scene_id\": " + scene_id + "}}}");
         ResponseEntity<String> response = restTemplate.postForEntity(url, jsonObject, String.class);
+        log.info("response:{}",response);
         if (response.getStatusCodeValue() == 200) {
             JSONObject qrcode = JSONObject.parseObject(response.getBody());
             if (StringUtils.isNotEmpty(qrcode.getString("ticket"))) {

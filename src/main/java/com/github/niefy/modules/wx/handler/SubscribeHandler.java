@@ -1,9 +1,11 @@
 package com.github.niefy.modules.wx.handler;
 
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import me.chanjar.weixin.mp.util.WxMpConfigStorageHolder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import com.github.niefy.modules.wx.service.WxUserService;
@@ -23,12 +25,15 @@ public class SubscribeHandler extends AbstractHandler {
     MsgReplyService msgReplyService;
     @Autowired
     WxUserService userService;
+    @Autowired
+    RedisTemplate redisTemplate;
 
     @Override
     public WxMpXmlOutMessage handle(WxMpXmlMessage wxMessage, Map<String, Object> context, WxMpService wxMpService,
                                     WxSessionManager sessionManager) {
 
         this.logger.info("新关注用户 OPENID: " + wxMessage.getFromUser() + "，事件：" + wxMessage.getEventKey());
+        redisTemplate.opsForValue().set("scene_id::"+wxMessage.getEventKey(),wxMessage.getFromUser(),2, TimeUnit.SECONDS);
         String appid = WxMpConfigStorageHolder.get();
         this.logger.info("appid:{}",appid);
         userService.refreshUserInfo(wxMessage.getFromUser(),appid);

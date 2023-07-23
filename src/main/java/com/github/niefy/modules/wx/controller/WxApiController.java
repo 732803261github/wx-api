@@ -86,7 +86,10 @@ public class WxApiController {
     }
 
     public static void main(String[] args) throws UnsupportedEncodingException {
-        System.out.println(String.format("https://open.weixin.qq.com/connect/oauth2/authorize?appid=%s&redirect_uri=%s&response_type=code&scope=snsapi_userinfo&forcePopup=true&state=%s#wechat_redirect", appId, URLEncoder.encode("http://www.ai-assistant.com.cn/wx/auth2code", "UTF-8"), "state"));
+//        System.out.println(String.format("https://open.weixin.qq.com/connect/oauth2/authorize?appid=%s&redirect_uri=%s&response_type=code&scope=snsapi_userinfo&forcePopup=true&state=%s#wechat_redirect", appId, URLEncoder.encode("http://www.ai-assistant.com.cn/wx/auth2code", "UTF-8"), "state"));
+        Random random = new Random();
+        int randomInt = random.nextInt();
+        System.out.println(randomInt);
     }
 
     @GetMapping(value = "/auth2code")
@@ -127,19 +130,22 @@ public class WxApiController {
 //        return R.ok().put(userJson);
 //    }
 
-    @GetMapping(value = "/pcAuth")
+    @GetMapping(value = "/auth")
     public String pageAuth() throws UnsupportedEncodingException {
         String token = getWxToken();
-        double uuid = Math.random() * 1000000;
-        log.info("uuid:{}",uuid);
+        Random random = new Random();
+        int randomNum = random.nextInt(900) + 100;
+        long time = new Date().getTime();
+        long scene_id = (long)randomNum + time;
+        log.info("scene_id:{}",scene_id);
         String url = String.format("https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token=%s", token);
-        JSONObject jsonObject = JSON.parseObject("{\"action_name\": \"QR_SCENE\", \"action_info\": {\"scene\": {\"scene_id\": " + uuid + "}}}");
+        JSONObject jsonObject = JSON.parseObject("{\"action_name\": \"QR_SCENE\", \"action_info\": {\"scene\": {\"scene_id\": " + scene_id + "}}}");
         ResponseEntity<String> response = restTemplate.postForEntity(url, jsonObject, String.class);
         if (response.getStatusCodeValue() == 200) {
             JSONObject qrcode = JSONObject.parseObject(response.getBody());
             if (StringUtils.isNotEmpty(qrcode.getString("ticket"))) {
                 String tickUrl = String.format("https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=%s", URLEncoder.encode(qrcode.getString("ticket"), "UTF-8"));
-                return "redirect:" + tickUrl;
+                return tickUrl;
             }
         }else {
             return "error";

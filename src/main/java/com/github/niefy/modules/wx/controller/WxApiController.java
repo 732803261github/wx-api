@@ -60,7 +60,7 @@ public class WxApiController {
             ResponseEntity<String> response = restTemplate.getForEntity(URL, String.class);
             if (response.getStatusCodeValue() == 200) {
                 JSONObject jsonObject = JSON.parseObject(response.getBody());
-                redisTemplate.opsForValue().set("access_token", response.getBody(), 3600, TimeUnit.SECONDS);
+                redisTemplate.opsForValue().set("access_token", response.getBody(), 600, TimeUnit.SECONDS);
                 return jsonObject.getString("access_token");
             }
         } else {
@@ -131,7 +131,7 @@ public class WxApiController {
 //    }
 
     @GetMapping(value = "/gencode")
-    public String pageAuth() throws UnsupportedEncodingException {
+    public R pageAuth() throws UnsupportedEncodingException {
         String token = getWxToken();
         Random random = new Random();
         int randomNum = random.nextInt(900) + 100;
@@ -146,12 +146,15 @@ public class WxApiController {
             JSONObject qrcode = JSONObject.parseObject(response.getBody());
             if (StringUtils.isNotEmpty(qrcode.getString("ticket"))) {
                 String tickUrl = String.format("https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=%s", URLEncoder.encode(qrcode.getString("ticket"), "UTF-8"));
-                return tickUrl;
+                Map<String ,Object> map = new HashMap<>();
+                map.put("sceneId",scene_id);
+                map.put("tickUrl",tickUrl);
+                return R.ok().put(map);
             }
         }else {
-            return "error";
+            return R.error();
         }
-        return "error";
+        return R.error();
     }
 
     @RequestMapping(value = "/infoSend")

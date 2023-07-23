@@ -27,10 +27,10 @@ public class ScanHandler extends AbstractHandler {
     public WxMpXmlOutMessage handle(WxMpXmlMessage wxMpXmlMessage, Map<String, Object> map,
                                     WxMpService wxMpService, WxSessionManager wxSessionManager) {
         //扫码事件处理
-        this.logger.info("用户扫描带参二维码 OPENID:{},事件:{}" + wxMpXmlMessage.getFromUser(),wxMpXmlMessage.getEventKey());
+        logger.info("用户扫描带参二维码 OPENID:{},事件:{}" + wxMpXmlMessage.getFromUser(), wxMpXmlMessage.getEventKey());
         WxUser wxUser = wxUserService.getById(wxMpXmlMessage.getFromUser());
-        if(wxUser.isSubscribe()){
-            logger.info("openid:{},订阅状态：{}",wxUser.getOpenid(),wxUser.isSubscribe());
+        if (wxUser.isSubscribe()) {
+            logger.info("openid:{},订阅状态:{}", wxUser.getOpenid(), wxUser.isSubscribe());
         }
         String appid = WxMpConfigStorageHolder.get();
         msgReplyService.tryAutoReply(appid, true, wxMpXmlMessage.getFromUser(), wxMpXmlMessage.getEventKey());

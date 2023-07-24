@@ -147,6 +147,7 @@ public class WxApiController {
             if (StringUtils.isNotEmpty(qrcode.getString("ticket"))) {
                 String tickUrl = String.format("https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=%s", URLEncoder.encode(qrcode.getString("ticket"), "UTF-8"));
                 Map<String ,Object> map = new HashMap<>();
+                map.put("ticket",qrcode.getString("ticket"));
                 map.put("sceneId",scene_id);
                 map.put("tickUrl",tickUrl);
                 return R.ok().put(map);

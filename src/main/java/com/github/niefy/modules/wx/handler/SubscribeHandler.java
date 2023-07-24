@@ -33,7 +33,7 @@ public class SubscribeHandler extends AbstractHandler {
                                     WxSessionManager sessionManager) {
 
         this.logger.info("新关注用户 OPENID: " + wxMessage.getFromUser() + "，事件：" + wxMessage.getEventKey());
-        redisTemplate.opsForValue().set("scene_id::"+wxMessage.getEventKey(),wxMessage.getFromUser(),2, TimeUnit.SECONDS);
+        redisTemplate.opsForValue().set("ticket::"+wxMessage.getTicket(),wxMessage.getFromUser(),2, TimeUnit.SECONDS);
         String appid = WxMpConfigStorageHolder.get();
         this.logger.info("appid:{}",appid);
         userService.refreshUserInfo(wxMessage.getFromUser(),appid);

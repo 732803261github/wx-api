@@ -160,8 +160,8 @@ public class WxApiController {
 
     @PostMapping(value = "scanres")
     public R scanres(String ticket) {
-        String openid = redisTemplate.opsForValue().get("ticket::" + ticket).toString();
-        if (StringUtils.isNotEmpty(openid)) {
+        if (ObjectUtils.isNotEmpty(redisTemplate.opsForValue().get("ticket::" + ticket))) {
+            String openid = redisTemplate.opsForValue().get("ticket::" + ticket).toString();
             return R.ok(openid);
         }
         return R.error();

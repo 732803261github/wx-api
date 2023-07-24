@@ -136,24 +136,33 @@ public class WxApiController {
         Random random = new Random();
         int randomNum = random.nextInt(900) + 100;
         long time = new Date().getTime();
-        long scene_id = (long)randomNum + time;
-        log.info("scene_id:{}",scene_id);
+        long scene_id = (long) randomNum + time;
+        log.info("scene_id:{}", scene_id);
         String url = String.format("https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token=%s", token);
         JSONObject jsonObject = JSON.parseObject("{\"action_name\": \"QR_SCENE\", \"action_info\": {\"scene\": {\"scene_id\": " + scene_id + "}}}");
         ResponseEntity<String> response = restTemplate.postForEntity(url, jsonObject, String.class);
-        log.info("response:{}",response);
+        log.info("response:{}", response);
         if (response.getStatusCodeValue() == 200) {
             JSONObject qrcode = JSONObject.parseObject(response.getBody());
             if (StringUtils.isNotEmpty(qrcode.getString("ticket"))) {
                 String tickUrl = String.format("https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=%s", URLEncoder.encode(qrcode.getString("ticket"), "UTF-8"));
-                Map<String ,Object> map = new HashMap<>();
-                map.put("ticket",qrcode.getString("ticket"));
-                map.put("sceneId",scene_id);
-                map.put("tickUrl",tickUrl);
+                Map<String, Object> map = new HashMap<>();
+                map.put("ticket", qrcode.getString("ticket"));
+                map.put("sceneId", scene_id);
+                map.put("tickUrl", tickUrl);
                 return R.ok().put(map);
             }
-        }else {
+        } else {
             return R.error();
+        }
+        return R.error();
+    }
+
+    @PostMapping(value = "scanres")
+    public R scanres(String ticket) {
+        String openid = redisTemplate.opsForValue().get("ticket::" + ticket).toString();
+        if (StringUtils.isNotEmpty(openid)) {
+            return R.ok(openid);
         }
         return R.error();
     }

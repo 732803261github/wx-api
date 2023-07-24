@@ -32,7 +32,7 @@ public class ScanHandler extends AbstractHandler {
                                     WxMpService wxMpService, WxSessionManager wxSessionManager) {
         //扫码事件处理
         logger.info("用户扫描带参二维码 OPENID:{},事件:{},ticket:{}",wxMpXmlMessage.getFromUser(), wxMpXmlMessage.getEventKey(),wxMpXmlMessage.getTicket());
-        redisTemplate.opsForValue().set("ticket::"+wxMpXmlMessage.getTicket(),wxMpXmlMessage.getFromUser(),2, TimeUnit.SECONDS);
+        redisTemplate.opsForValue().set("ticket::"+wxMpXmlMessage.getTicket(),wxMpXmlMessage.getFromUser(),60, TimeUnit.SECONDS);
         WxUser wxUser = wxUserService.getById(wxMpXmlMessage.getFromUser());
         if (wxUser.isSubscribe()) {
             logger.info("openid:{},订阅状态:{}", wxUser.getOpenid(), wxUser.isSubscribe());

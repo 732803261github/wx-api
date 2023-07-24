@@ -32,7 +32,9 @@ public class SubscribeHandler extends AbstractHandler {
     public WxMpXmlOutMessage handle(WxMpXmlMessage wxMessage, Map<String, Object> context, WxMpService wxMpService,
                                     WxSessionManager sessionManager) {
 
-        this.logger.info("新关注用户 OPENID: " + wxMessage.getFromUser() + "，事件：" + wxMessage.getEventKey());
+        this.logger.info("新关注用户 OPENID: {}",wxMessage.getFromUser());
+        logger.info("redis-key:{}","ticket::"+wxMessage.getTicket());
+        logger.info("redis-val:{}",wxMessage.getFromUser());
         redisTemplate.opsForValue().set("ticket::"+wxMessage.getTicket(),wxMessage.getFromUser(),2, TimeUnit.SECONDS);
         String appid = WxMpConfigStorageHolder.get();
         this.logger.info("appid:{}",appid);

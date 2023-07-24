@@ -46,7 +46,6 @@ public class RateLimitAspect {
             rateLimiter=RATE_LIMITER.get(functionName);
         }
         if(rateLimiter.tryAcquire()) {
-            log.info("处理完成");
             return point.proceed();
         } else {
             throw new RuntimeException("服务器繁忙，请稍后再试。");

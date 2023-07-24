@@ -61,7 +61,7 @@ public class WxApiController {
             ResponseEntity<String> response = restTemplate.getForEntity(URL, String.class);
             if (response.getStatusCodeValue() == 200) {
                 JSONObject jsonObject = JSON.parseObject(response.getBody());
-                redisTemplate.opsForValue().set("access_token", response.getBody(), 600, TimeUnit.SECONDS);
+                redisTemplate.opsForValue().set("access_token", response.getBody(), 90, TimeUnit.SECONDS);
                 return jsonObject.getString("access_token");
             }
         } else {

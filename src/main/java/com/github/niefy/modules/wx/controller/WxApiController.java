@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.niefy.common.utils.DateUtils;
 import com.github.niefy.common.utils.R;
+import com.github.niefy.modules.wx.aspect.Limiting;
 import com.github.niefy.modules.wx.entity.WxUser;
 import com.github.niefy.modules.wx.service.TemplateMsgService;
 import com.github.niefy.modules.wx.service.WxAccountService;
@@ -86,34 +87,12 @@ public class WxApiController {
     }
 
     public static void main(String[] args) throws UnsupportedEncodingException {
-//        System.out.println(String.format("https://open.weixin.qq.com/connect/oauth2/authorize?appid=%s&redirect_uri=%s&response_type=code&scope=snsapi_userinfo&forcePopup=true&state=%s#wechat_redirect", appId, URLEncoder.encode("http://www.ai-assistant.com.cn/wx/auth2code", "UTF-8"), "state"));
         Random random = new Random();
         int randomInt = random.nextInt();
         System.out.println(randomInt);
     }
 
-    @GetMapping(value = "/auth2code")
-    public R code2userinfo(HttpServletRequest request) {
-        secret = redisTemplate.opsForValue().get("secret").toString();
-        String code = request.getParameter("code");
-        log.info("auth2code:{}", code);
-        String url = String.format("https://api.weixin.qq.com/sns/oauth2/access_token?appid=%s&secret=%s&code=%s&grant_type=authorization_code", appId, secret, code);
-        ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
-        if (response.getStatusCodeValue() == 200) {
-            JSONObject jsonObject = JSON.parseObject(response.getBody());
-            String access_token = jsonObject.getString("access_token");
-            String openid = jsonObject.getString("openid");
-            //获取用户信息
-            String userInfoUrl = String.format("https://api.weixin.qq.com/sns/userinfo?access_token=%s&openid=%s&lang=zh_CN", access_token, openid);
-            ResponseEntity<String> response2 = restTemplate.getForEntity(userInfoUrl, String.class);
-            JSONObject userJson = JSONObject.parseObject(response2.getBody());
-            log.info("openid为：{}的用户信息是：{}", openid, userJson);
-            return R.ok().put(userJson);
-        } else {
-            return R.error("系统异常");
-        }
-    }
-
+    @Limiting(limitNum = 2, name = "gencodeLimit")
     @GetMapping(value = "/gencode")
     public R pageAuth() throws UnsupportedEncodingException {
         String token = getWxToken();
@@ -121,7 +100,6 @@ public class WxApiController {
         int randomNum = random.nextInt(900) + 100;
         long time = new Date().getTime();
         long scene_id = (long) randomNum + time;
-        log.info("scene_id:{}", scene_id);
         String url = String.format("https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token=%s", token);
         JSONObject jsonObject = JSON.parseObject("{\"action_name\": \"QR_SCENE\", \"action_info\": {\"scene\": {\"scene_id\": " + scene_id + "}}}");
         ResponseEntity<String> response = restTemplate.postForEntity(url, jsonObject, String.class);
@@ -132,7 +110,6 @@ public class WxApiController {
                 String tickUrl = String.format("https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=%s", URLEncoder.encode(qrcode.getString("ticket"), "UTF-8"));
                 Map<String, Object> map = new HashMap<>();
                 map.put("ticket", qrcode.getString("ticket"));
-                map.put("sceneId", scene_id);
                 map.put("tickUrl", tickUrl);
                 return R.ok().put(map);
             }

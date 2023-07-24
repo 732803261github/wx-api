@@ -76,7 +76,7 @@ public class WxApiController {
         if (redisTemplate.opsForValue().get(key) == null) {
             WxUser wxUser = userService.getById(openid);
             if (ObjectUtils.isNotEmpty(wxUser)) {
-                redisTemplate.opsForValue().set(key, wxUser, 1, TimeUnit.HOURS);
+                redisTemplate.opsForValue().set(key, wxUser, 30, TimeUnit.SECONDS);
                 return R.ok().put(wxUser);
             }
         } else {
@@ -113,22 +113,6 @@ public class WxApiController {
             return R.error("系统异常");
         }
     }
-
-//    @GetMapping(value = "/invoke")
-//    public R invoke(HttpServletRequest request) {
-//        JSONObject userJson = JSONObject.parseObject("{\n" +
-//                "    \"country\": \"\",\n" +
-//                "    \"province\": \"\",\n" +
-//                "    \"city\": \"\",\n" +
-//                "    \"openid\": \"o731S6QvW6NlhTkJyGYJNItsu9a8\",\n" +
-//                "    \"sex\": 0,\n" +
-//                "    \"nickname\": \"nope\",\n" +
-//                "    \"headimgurl\": \"https://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTKXibCpNjT7gCEjSHWm02AzDmXpI0Z5gicw2t7VyS4klQ63NF5v9CNg4oE4vz2zcSlOibQe1C6pjegnQ/132\",\n" +
-//                "    \"language\": \"\",\n" +
-//                "    \"privilege\": []\n" +
-//                "}");
-//        return R.ok().put(userJson);
-//    }
 
     @GetMapping(value = "/gencode")
     public R pageAuth() throws UnsupportedEncodingException {

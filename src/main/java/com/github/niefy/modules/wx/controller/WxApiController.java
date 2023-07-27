@@ -125,7 +125,7 @@ public class WxApiController {
     }
 
     @RequestMapping(value = "/infoSend")
-    void sendTemplateMsg(String openid) {
+    void sendTemplateMsg(String openid,String taskid) {
         openid = "o731S6QvW6NlhTkJyGYJNItsu9a8";
         String appid = String.valueOf(redisTemplate.opsForValue().get("appid"));
         List<WxMpTemplateData> data = new ArrayList<>();

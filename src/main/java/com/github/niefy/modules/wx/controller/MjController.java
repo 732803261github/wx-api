@@ -37,7 +37,7 @@ public class MjController {
         Map<String, Object> map = new HashMap<>();
         HttpEntity requestEntity = new HttpEntity(map, headers);
         String response = restTemplate.exchange(
-                "https://discord.com/api/v9/channels/1120568025993715764/messages?limit=20",
+                "https://discord.com/api/v9/channels/1134012605736960053/messages?limit=20",
                 HttpMethod.GET,
                 requestEntity,
                 String.class

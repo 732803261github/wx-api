@@ -36,10 +36,7 @@ public class MjController {
         headers.set("authorization", String.valueOf(redisTemplate.opsForValue().get("authorization")));
         Map<String, Object> map = new HashMap<>();
         HttpEntity requestEntity = new HttpEntity(map, headers);
-        String url = String.format("https://discord.com/api/v9/channels/%s/messages?limit=20",redisTemplate.opsForValue().get("channel").toString());
-        log.info("url:{}",url);
-        System.out.println(redisTemplate.opsForValue().get("channel"));
-        System.out.println(redisTemplate.opsForValue().get("channel").toString());
+        String url = String.format("https://discord.com/api/v9/channels/%s/messages?limit=20",redisTemplate.opsForValue().get("channel"));
         String response = restTemplate.exchange(
                 url,
                 HttpMethod.GET,

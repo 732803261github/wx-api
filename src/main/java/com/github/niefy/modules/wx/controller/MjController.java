@@ -44,6 +44,7 @@ public class MjController {
         ).getBody();
         List<String> list = new ArrayList<>();
         JSONArray objects = JSON.parseArray(response);
+        log.info("{}",objects);
         for (Object object : objects) {
             for (Object attachments : ((JSONObject) object).getJSONArray("attachments")) {
                 String string = ((JSONObject) attachments).getString("proxy_url");

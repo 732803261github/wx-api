@@ -35,7 +35,8 @@ public class ImageFetchTask {
         headers.set("authorization", authorization);
         Map<String, Object> map = new HashMap<>();
         HttpEntity requestEntity = new HttpEntity(map, headers);
-        String api = "https://discord.com/api/v9/channels/1134012605736960053/messages?limit=50" + (!"null".equals(lastId) ? "&before=" + lastId : "");
+        String channel = String.format("https://discord.com/api/v9/channels/%s/messages?limit=50", redisTemplate.opsForValue().get("channel"));
+        String api = channel+ (!"null".equals(lastId) ? "&before=" + lastId : "");
         String response = restTemplate.exchange(
                 api,
                 HttpMethod.GET,

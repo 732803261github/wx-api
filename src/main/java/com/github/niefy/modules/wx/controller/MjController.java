@@ -11,6 +11,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
@@ -18,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @RestController
@@ -42,13 +44,13 @@ public class MjController {
         ).getBody();
         List<String> list = new ArrayList<>();
         JSONArray objects = JSON.parseArray(response);
-//        for (Object object : objects) {
-//            for (Object attachments : ((JSONObject) object).getJSONArray("attachments")) {
-//                String string = ((JSONObject) attachments).getString("proxy_url");
-//                String replace = string.replace("https://media.discordapp.net", "http://www.ai-assistant.com.cn/api/cnd-discordapp");
-//                list.add(replace+"?Authorization=9998@xunshu");
-//            }
-//        }
+        for (Object object : objects) {
+            for (Object attachments : ((JSONObject) object).getJSONArray("attachments")) {
+                String string = ((JSONObject) attachments).getString("proxy_url");
+                String replace = string.replace("https://media.discordapp.net", "http://www.ai-assistant.com.cn/api/cnd-discordapp");
+                list.add(replace+"?Authorization=9998@xunshu");
+            }
+        }
         return R.ok().put(objects);
     }
 
@@ -57,6 +59,15 @@ public class MjController {
         String s = String.valueOf(redisTemplate.opsForValue().get(taskId));
         return R.ok().put(s);
     }
+
+    @PostMapping(value = "/bindTask")
+    public void bindTask(String openid,String taskid){
+        String key = openid+"::"+taskid;
+        redisTemplate.opsForValue().set(key,"",3, TimeUnit.DAYS);
+        log.info("{}缓存成功",key);
+    }
+
+
 
     public static void main(String[] args) {
         String response = "[\n" +

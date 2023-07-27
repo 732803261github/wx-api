@@ -22,11 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.net.URLEncoder;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -129,7 +125,8 @@ public class WxApiController {
     }
 
     @RequestMapping(value = "/infoSend")
-    void sendTemplateMsg() {
+    void sendTemplateMsg(String openid) {
+        openid = "o731S6QvW6NlhTkJyGYJNItsu9a8";
         String appid = String.valueOf(redisTemplate.opsForValue().get("appid"));
         List<WxMpTemplateData> data = new ArrayList<>();
         data.add(new WxMpTemplateData("character_string2", "3878599093670556"));
@@ -137,7 +134,7 @@ public class WxApiController {
         WxMpTemplateMessage wxMpTemplateMessage = WxMpTemplateMessage.builder()
                 .templateId("K_WOhj5KoEgBc7MomCHL4wbq6i82ULsyxDDKepVnZVs")
                 .url("http://ai-assistant.com.cn/api/cnd-discordapp/attachments/1120568025993715764/1129837389020414062/oliverdaniel_3878599093670556_Swans_fish_in_the_lake_during_the_4a97a352-a0ec-47c0-80a2-c6071031a23b.png?Authorization=9998@xunshu")
-                .toUser("o731S6QvW6NlhTkJyGYJNItsu9a8")
+                .toUser(openid)
                 .data(data)
                 .build();
         templateMsgService.sendTemplateMsg(wxMpTemplateMessage, appid);

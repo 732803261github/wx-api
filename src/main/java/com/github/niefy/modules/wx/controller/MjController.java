@@ -47,12 +47,11 @@ public class MjController {
         for (Object object : objects) {
             for (Object attachments : ((JSONObject) object).getJSONArray("attachments")) {
                 String string = ((JSONObject) attachments).getString("proxy_url");
-                log.info("{}",string);
                 String replace = string.replace("https://media.discordapp.net", "http://www.ai-assistant.com.cn/api/cnd-discordapp");
                 list.add(replace+"?Authorization=9998@xunshu");
             }
         }
-        return R.ok().put(objects);
+        return R.ok().put(list);
     }
 
     @GetMapping(value = "/getImg")

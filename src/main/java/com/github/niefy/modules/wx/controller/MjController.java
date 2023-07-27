@@ -36,7 +36,7 @@ public class MjController {
         headers.set("authorization", String.valueOf(redisTemplate.opsForValue().get("authorization")));
         Map<String, Object> map = new HashMap<>();
         HttpEntity requestEntity = new HttpEntity(map, headers);
-        String url = String.format("https://discord.com/api/v9/channels/%s/messages?limit=20",redisTemplate.opsForValue().get("channel"));
+        String url = String.format("https://discord.com/api/v9/channels/%s/messages?limit=20", redisTemplate.opsForValue().get("channel"));
         String response = restTemplate.exchange(
                 url,
                 HttpMethod.GET,
@@ -49,25 +49,23 @@ public class MjController {
             for (Object attachments : ((JSONObject) object).getJSONArray("attachments")) {
                 String string = ((JSONObject) attachments).getString("proxy_url");
                 String replace = string.replace("https://media.discordapp.net", "http://www.ai-assistant.com.cn/api/cnd-discordapp");
-                list.add(replace+"?Authorization=9998@xunshu");
+                list.add(replace + "?Authorization=9998@xunshu");
             }
         }
         return R.ok().put(list);
     }
 
     @GetMapping(value = "/getImg")
-    public R getImg(String taskId){
+    public R getImg(String taskId) {
         String s = String.valueOf(redisTemplate.opsForValue().get(taskId));
         return R.ok().put(s);
     }
 
     @PostMapping(value = "/bindTask")
-    public void bindTask(String openid,String taskid){
-        String key = openid+"::"+taskid;
-        redisTemplate.opsForValue().set(key,"",3, TimeUnit.DAYS);
-        log.info("{}缓存成功",key);
+    public void bindTask(String openid, String taskid) {
+        String key = openid + "::" + taskid;
+        redisTemplate.opsForValue().set(key, "", 30, TimeUnit.DAYS);
     }
-
 
 
     public static void main(String[] args) {

@@ -123,20 +123,4 @@ public class WxApiController {
         }
         return R.error();
     }
-
-    @RequestMapping(value = "/infoSend")
-    void sendTemplateMsg(String openid,String taskid) {
-        openid = "o731S6QvW6NlhTkJyGYJNItsu9a8";
-        String appid = String.valueOf(redisTemplate.opsForValue().get("appid"));
-        List<WxMpTemplateData> data = new ArrayList<>();
-        data.add(new WxMpTemplateData("character_string2", "3878599093670556"));
-        data.add(new WxMpTemplateData("time3", DateUtils.format(new Date(), "yyyy-MM-dd HH:mm")));
-        WxMpTemplateMessage wxMpTemplateMessage = WxMpTemplateMessage.builder()
-                .templateId("K_WOhj5KoEgBc7MomCHL4wbq6i82ULsyxDDKepVnZVs")
-                .url("http://ai-assistant.com.cn/api/cnd-discordapp/attachments/1120568025993715764/1129837389020414062/oliverdaniel_3878599093670556_Swans_fish_in_the_lake_during_the_4a97a352-a0ec-47c0-80a2-c6071031a23b.png?Authorization=9998@xunshu")
-                .toUser(openid)
-                .data(data)
-                .build();
-        templateMsgService.sendTemplateMsg(wxMpTemplateMessage, appid);
-    }
 }

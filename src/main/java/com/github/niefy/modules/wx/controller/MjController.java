@@ -37,6 +37,7 @@ public class MjController {
         Map<String, Object> map = new HashMap<>();
         HttpEntity requestEntity = new HttpEntity(map, headers);
         String url = String.format("https://discord.com/api/v9/channels/%s/messages?limit=20",redisTemplate.opsForValue().get("channel"));
+        log.info("url:{}",url);
         String response = restTemplate.exchange(
                 url,
                 HttpMethod.GET,

@@ -40,11 +40,13 @@ public class WxMessageTask {
         });
     }
     void sendTemplateMsg(String openid,String taskid) {
+        log.info("openid:{},taskid:{}",openid,taskid);
         String appid = String.valueOf(redisTemplate.opsForValue().get("appid"));
         List<WxMpTemplateData> data = new ArrayList<>();
         data.add(new WxMpTemplateData("character_string2", "3878599093670556"));
         data.add(new WxMpTemplateData("time3", DateUtils.format(new Date(), "yyyy-MM-dd HH:mm")));
         String url = redisTemplate.opsForValue().get(taskid).toString();
+        log.info("url:{}",url);
         WxMpTemplateMessage wxMpTemplateMessage = WxMpTemplateMessage.builder()
                 .templateId("K_WOhj5KoEgBc7MomCHL4wbq6i82ULsyxDDKepVnZVs")
                 .url(url)

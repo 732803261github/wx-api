@@ -32,7 +32,7 @@ public class WxMessageTask {
         List<String> keys = new ArrayList<>(redisTemplate.keys(pattern));
         // 获取匹配模式的所有数据
         List<String> data = new ArrayList<>(redisTemplate.opsForValue().multiGet(keys));
-        log.info("{}的所有数据是：{}",pattern,data);
+        log.info("{}的所有数据keys是：{}",pattern,keys);
     }
     void sendTemplateMsg(String openid,String taskid) {
         String appid = String.valueOf(redisTemplate.opsForValue().get("appid"));

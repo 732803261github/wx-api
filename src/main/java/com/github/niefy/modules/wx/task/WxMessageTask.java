@@ -34,8 +34,7 @@ public class WxMessageTask {
         keys.stream().forEach(key->{
             String taskid = key.split("taskdone-")[1];
             log.info("taskid={}",taskid);
-            List<String> keys2 = (List<String>) redisTemplate.keys(taskid + "-*");
-            log.info("key2={}",keys2);
+            List<String> keys2 = new ArrayList<String>(redisTemplate.keys(taskid + "-*"));
             keys2.stream().forEach(key2->{
                 System.out.println("openid="+key2.split(taskid+"-")[1]);
             });

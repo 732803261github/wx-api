@@ -59,9 +59,9 @@ public class MjController {
         return R.ok().put(s);
     }
 
-    @PostMapping(value = "/bindTask")
+    @PostMapping(value = "/bind/task")
     public void bindTask(String openid, String taskid) {
-        String key = openid + "::" + taskid;
+        String key = openid + "-" + taskid;
         redisTemplate.opsForValue().set(key, "", 30, TimeUnit.DAYS);
     }
 

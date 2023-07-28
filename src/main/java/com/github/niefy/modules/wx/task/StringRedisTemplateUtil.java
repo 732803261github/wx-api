@@ -10,12 +10,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
-public class RedisUtil {
+public class StringRedisTemplateUtil {
 
     @Autowired
     RedisTemplate redisTemplate;
 
-    public List<String> getKeys(String pattern){
+    public List<String> keys(String pattern){
         Set<String> keys = (Set<String>) this.redisTemplate.execute((RedisCallback<Set<String>>) connection -> {
             Cursor<byte[]> cursor = connection.scan(ScanOptions.scanOptions().match(pattern).count(1000).build());
             return cursor.stream().map(String::new).collect(Collectors.toSet());

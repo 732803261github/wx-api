@@ -22,21 +22,21 @@ public class WxMessageTask {
     StringRedisTemplate stringRedisTemplate;
 
     @Autowired
-    RedisUtil redisUtil;
+    StringRedisTemplateUtil redisUtil;
 
     @Autowired
     private TemplateMsgService templateMsgService;
 
     @Scheduled(cron = "0/10 * * * * ?")
     public void message() {
-        List<String> keys = (List<String>) stringRedisTemplate.keys("taskdone-*");
+        List<String> keys = redisUtil.keys("taskdone-*");
         log.info("taskdone-*的所有数据keys是：{}",keys);
         keys.stream().forEach(key->{
-            String openid = stringRedisTemplate.opsForValue().get(key.split("taskdone-")[1]).toString();
-            System.out.println(stringRedisTemplate.keys(openid + "-*"));
-            List<String> keys2 = (List<String>) stringRedisTemplate.keys(key.split("taskdone-")[1] + "-*");
+            String openid = redisUtil.get(key.split("taskdone-")[1]).toString();
+            System.out.println("openid="+redisUtil.keys(openid + "-*"));
+            List<String> keys2 = redisUtil.keys(openid + "-*");
             keys2.stream().forEach(key2->{
-                System.out.println(key2);
+                System.out.println("taskid="+key2.split(openid+"-")[1]);
             });
         });
     }

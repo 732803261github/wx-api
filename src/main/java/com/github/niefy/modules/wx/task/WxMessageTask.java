@@ -24,21 +24,23 @@ public class WxMessageTask {
     RestTemplate restTemplate = new RestTemplate();
 
     @Autowired
+    RedisUtil redisUtil;
+
+    @Autowired
     private TemplateMsgService templateMsgService;
 
     @Scheduled(cron = "0/10 * * * * ?")
     public void message() {
-        String pattern ="taskdone-*";
-        Set<String> keys = (Set<String>) this.redisTemplate.execute((RedisCallback<Set<String>>) connection -> {
-            Cursor<byte[]> cursor = connection.scan(ScanOptions.scanOptions().match(pattern).count(1000).build());
-            return cursor.stream().map(String::new).collect(Collectors.toSet());
+        Set<String> keys = redisUtil.getKeys("taskdone-*");
+        log.info("taskdone-*的所有数据keys是：{}",keys);
+        keys.stream().forEach(key->{
+            redisTemplate.opsForValue().get(key.split("taskdone-")[1]);
+            System.out.println(redisUtil.getKeys(key.split("taskdone-")[1] + "-*"));
+            TreeSet<String> keys2 = (TreeSet<String>) redisUtil.getKeys(key.split("taskdone-")[1] + "-*");
+            keys2.stream().forEach(key2->{
+                System.out.println(key2);
+            });
         });
-        log.info("{}的所有数据keys是：{}",pattern,keys);
-        ValueOperations<String, String> operations = this.redisTemplate.opsForValue();
-        List<String> collect = keys.stream().map(operations::get)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
-        log.info("keys:{}",collect);
     }
     void sendTemplateMsg(String openid,String taskid) {
         String appid = String.valueOf(redisTemplate.opsForValue().get("appid"));

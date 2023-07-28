@@ -7,7 +7,6 @@ import com.github.niefy.common.utils.R;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -62,7 +61,7 @@ public class MjController {
     @PostMapping(value = "/bind/task")
     public void bindTask(String openid, String taskid) {
         log.info("绑定开始，openid={},taskid={}",openid,taskid);
-        String key = openid + "-" + taskid;
+        String key = taskid + "-" + openid;
         redisTemplate.opsForValue().set(key, "", 30, TimeUnit.DAYS);
     }
 

@@ -29,9 +29,9 @@ public class WxMessageTask {
     public void message() {
         String pattern ="task-finish::*";
         // 获取匹配模式的所有键的集合
-        Set<String> keys = redisTemplate.keys(pattern);
+        List<String> keys = new ArrayList<>(redisTemplate.keys(pattern));
         // 获取匹配模式的所有数据
-        Set<String> data = (Set<String>) redisTemplate.opsForValue().multiGet(keys);
+        List<String> data = new ArrayList<>(redisTemplate.opsForValue().multiGet(keys));
         log.info("{}的所有数据是：{}",pattern,data);
     }
     void sendTemplateMsg(String openid,String taskid) {

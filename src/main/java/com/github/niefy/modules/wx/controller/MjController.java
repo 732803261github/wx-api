@@ -61,6 +61,7 @@ public class MjController {
 
     @PostMapping(value = "/bind/task")
     public void bindTask(String openid, String taskid) {
+        log.info("绑定开始，openid={},taskid={}",openid,taskid);
         String key = openid + "-" + taskid;
         redisTemplate.opsForValue().set(key, "", 30, TimeUnit.DAYS);
     }

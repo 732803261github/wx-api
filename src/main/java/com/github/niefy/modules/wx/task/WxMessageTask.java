@@ -52,10 +52,10 @@ public class WxMessageTask {
                 .toUser(openid)
                 .data(data)
                 .build();
-        templateMsgService.sendTemplateMsg(wxMpTemplateMessage, appid);
-//        redisTemplate.delete(taskid);
-//        redisTemplate.delete("taskdone-".concat(taskid));
-//        redisTemplate.delete(taskid.concat("-").concat(openid));
+//        templateMsgService.sendTemplateMsg(wxMpTemplateMessage, appid);
+        redisTemplate.delete(taskid);
+        redisTemplate.delete("taskdone-".concat(taskid));
+        redisTemplate.delete(taskid.concat("-").concat(openid));
 
     }
 }

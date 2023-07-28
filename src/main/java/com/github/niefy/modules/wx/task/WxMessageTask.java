@@ -30,13 +30,12 @@ public class WxMessageTask {
     @Scheduled(cron = "0/10 * * * * ?")
     public void message() {
         List<String> keys = redisUtil.keys("taskdone-*");
-        log.info("taskdone-*的所有数据keys是：{}",keys);
         keys.stream().forEach(key->{
             String taskid = key.split("taskdone-")[1];
-            log.info("taskid={}",taskid);
-            List<String> keys2 = new ArrayList<String>(redisTemplate.keys(taskid + "-*"));
+            List<String> keys2 = new ArrayList<String>(redisTemplate.keys(taskid.concat("-*")));
             keys2.stream().forEach(key2->{
-                System.out.println("openid="+key2.split(taskid+"-")[1]);
+                String openid = key2.split(taskid.concat("-"))[1];
+                sendTemplateMsg(openid,redisTemplate.opsForValue().get(taskid).toString());
             });
         });
     }
@@ -53,5 +52,9 @@ public class WxMessageTask {
                 .data(data)
                 .build();
         templateMsgService.sendTemplateMsg(wxMpTemplateMessage, appid);
+        redisTemplate.delete(taskid);
+        redisTemplate.delete("taskdone-".concat(taskid));
+        redisTemplate.delete(taskid.concat("-").concat(openid));
+
     }
 }

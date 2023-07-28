@@ -27,7 +27,7 @@ public class WxMessageTask {
 
     @Scheduled(cron = "0/10 * * * * ?")
     public void message() {
-        String pattern ="task-finish::*";
+        String pattern ="task-finish*";
         // 获取匹配模式的所有键的集合
         List<String> keys = new ArrayList<>(redisTemplate.keys(pattern));
         // 获取匹配模式的所有数据

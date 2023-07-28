@@ -32,8 +32,8 @@ public class WxMessageTask {
         List<String> keys = redisUtil.keys("taskdone-*");
         log.info("taskdone-*的所有数据keys是：{}",keys);
         keys.stream().forEach(key->{
-            String openid = redisUtil.get(key.split("taskdone-")[1]).toString();
-            System.out.println("openid="+redisUtil.keys(openid + "-*"));
+            String openid = key.split("taskdone-")[1];
+            log.info("openid={}",openid);
             List<String> keys2 = redisUtil.keys(openid + "-*");
             keys2.stream().forEach(key2->{
                 System.out.println("taskid="+key2.split(openid+"-")[1]);

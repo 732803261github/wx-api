@@ -9,10 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.*;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -20,8 +18,8 @@ public class WxMessageTask {
 
     @Autowired
     RedisTemplate redisTemplate;
-
-    RestTemplate restTemplate = new RestTemplate();
+    @Autowired
+    StringRedisTemplate stringRedisTemplate;
 
     @Autowired
     RedisUtil redisUtil;
@@ -31,12 +29,12 @@ public class WxMessageTask {
 
     @Scheduled(cron = "0/10 * * * * ?")
     public void message() {
-        List<String> keys = redisUtil.getKeys("taskdone-*");
+        List<String> keys = (List<String>) stringRedisTemplate.keys("taskdone-*");
         log.info("taskdone-*的所有数据keys是：{}",keys);
         keys.stream().forEach(key->{
-            redisTemplate.opsForValue().get(key.split("taskdone-")[1]);
-            System.out.println(redisUtil.getKeys(key.split("taskdone-")[1] + "-*"));
-            List<String> keys2 = redisUtil.getKeys(key.split("taskdone-")[1] + "-*");
+            String openid = stringRedisTemplate.opsForValue().get(key.split("taskdone-")[1]).toString();
+            System.out.println(stringRedisTemplate.keys(openid + "-*"));
+            List<String> keys2 = (List<String>) stringRedisTemplate.keys(key.split("taskdone-")[1] + "-*");
             keys2.stream().forEach(key2->{
                 System.out.println(key2);
             });

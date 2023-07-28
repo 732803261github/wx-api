@@ -1,10 +1,7 @@
 package com.github.niefy.modules.wx.task;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.Cursor;
-import org.springframework.data.redis.core.RedisCallback;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ScanOptions;
+import org.springframework.data.redis.core.*;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -25,6 +22,12 @@ public class RedisUtil {
         });
         List<String> list = new ArrayList<>(keys);
         return list;
+    }
+
+    public String get(String key){
+        ValueOperations<String, Object> valueOps = redisTemplate.opsForValue();
+        String string = valueOps.get(key).toString();
+        return string;
     }
 
 }

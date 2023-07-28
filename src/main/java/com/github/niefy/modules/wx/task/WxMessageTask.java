@@ -6,12 +6,13 @@ import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.mp.bean.template.WxMpTemplateData;
 import me.chanjar.weixin.mp.bean.template.WxMpTemplateMessage;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.*;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -28,9 +29,16 @@ public class WxMessageTask {
     @Scheduled(cron = "0/10 * * * * ?")
     public void message() {
         String pattern ="taskdone-*";
-        // 获取匹配模式的所有键的集合
-        List<String> keys = new ArrayList<>(redisTemplate.keys(pattern));
+        Set<String> keys = (Set<String>) this.redisTemplate.execute((RedisCallback<Set<String>>) connection -> {
+            Cursor<byte[]> cursor = connection.scan(ScanOptions.scanOptions().match(pattern).count(1000).build());
+            return cursor.stream().map(String::new).collect(Collectors.toSet());
+        });
         log.info("{}的所有数据keys是：{}",pattern,keys);
+        ValueOperations<String, String> operations = this.redisTemplate.opsForValue();
+        List<String> collect = keys.stream().map(operations::get)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+        log.info("keys:{}",collect);
     }
     void sendTemplateMsg(String openid,String taskid) {
         String appid = String.valueOf(redisTemplate.opsForValue().get("appid"));

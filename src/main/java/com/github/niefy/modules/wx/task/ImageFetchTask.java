@@ -60,10 +60,11 @@ public class ImageFetchTask {
                 for (Object attachments : ((JSONObject) object).getJSONArray("attachments")) {
                     String taskid = ((JSONObject) object).getString("content").split("]")[0].substring(3);
                     boolean isNumeric = taskid.matches("\\d+");
-                    if (isNumeric && StringUtils.isEmpty(((JSONObject) object).getString("webhook_id")) && !CollectionUtils.isEmpty(stringRedisTemplate.keys("taskdone-".concat(taskid)))) {
+                    if (isNumeric && StringUtils.isEmpty(((JSONObject) object).getString("webhook_id"))) {
                         String string = ((JSONObject) attachments).getString("proxy_url");
                         String replace = string.replace("https://media.discordapp.net", "http://www.ai-assistant.com.cn/api/cnd-discordapp");
                         String url = replace + "?Authorization=9998@xunshu";
+                        redisTemplate.opsForValue().getAndDelete(taskid);
                         redisTemplate.opsForValue().set(taskid, url, 30, TimeUnit.SECONDS);
                     }
                 }

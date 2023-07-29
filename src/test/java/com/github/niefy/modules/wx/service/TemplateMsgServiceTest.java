@@ -4,6 +4,7 @@ import com.github.niefy.common.utils.DateUtils;
 import me.chanjar.weixin.mp.bean.template.WxMpTemplateData;
 import me.chanjar.weixin.mp.bean.template.WxMpTemplateMessage;
 import me.chanjar.weixin.mp.util.WxMpConfigStorageHolder;
+import org.apache.commons.lang3.ObjectUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,7 +24,7 @@ class TemplateMsgServiceTest {
     @Autowired
     TemplateMsgService templateMsgService;
     @Autowired
-    StringRedisTemplate redisTemplate;
+    StringRedisTemplate stringRedisTemplate;
 
     /**
      * 发送模板消息给用户
@@ -49,8 +50,7 @@ class TemplateMsgServiceTest {
 
     @Test
     void redisTest(){
-        String key = "9244402853440658";
-        ValueOperations valueOperations = redisTemplate.opsForValue();
-        redisTemplate.delete(key);
+        String key = "taskdone-".concat("97553783703432420");
+        boolean notEmpty = ObjectUtils.isNotEmpty(stringRedisTemplate.keys(key));
     }
 }

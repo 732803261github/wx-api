@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.niefy.common.utils.R;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -54,10 +55,17 @@ public class MjController {
         return R.ok().put(objects);
     }
 
-    @GetMapping(value = "/getImg")
-    public R getImg(String taskId) {
-        String s = String.valueOf(redisTemplate.opsForValue().get(taskId));
-        return R.ok().put(s);
+    @GetMapping(value = "/fetchImgById")
+    public R getImg(String openid, List<String> taskids) {
+        Map<String, Object> map = new HashMap<>();
+        taskids.stream().forEach(taskid -> {
+            String key = taskid.concat("-").concat(openid);
+            if (ObjectUtils.isNotEmpty(redisTemplate.opsForValue().get(key))) {
+                String s = String.valueOf(redisTemplate.opsForValue().get(key));
+                map.put(taskid, s);
+            }
+        });
+        return R.ok().put(map);
     }
 
     @PostMapping(value = "/bind/task")

@@ -28,7 +28,7 @@ public class ImageFetchTask {
     RestTemplate restTemplate = new RestTemplate();
 
     @Scheduled(cron = "0/10 * * * * ?")
-    public void getImg() {
+    public void cacheImgUrl() {
         String lastId = String.valueOf(redisTemplate.opsForValue().get("lastId"));
         String authorization = String.valueOf(redisTemplate.opsForValue().get("authorization"));
         HttpHeaders headers = new HttpHeaders();

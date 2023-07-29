@@ -54,8 +54,9 @@ public class WxMessageTask {
                     .build();
             templateMsgService.sendTemplateMsg(wxMpTemplateMessage, appid);
             redisTemplate.delete(taskid);
-            redisTemplate.delete(taskid.concat("-").concat(openid));
+            redisTemplate.opsForValue().getAndSet(taskid.concat("-").concat(openid),url);
             stringRedisTemplate.delete("taskdone-".concat(taskid));
+            stringRedisTemplate.delete("mj-task::".concat(taskid));
         }
     }
 }

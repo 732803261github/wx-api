@@ -4,10 +4,10 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.niefy.common.utils.R;
-import com.github.niefy.modules.wx.task.StringRedisTemplateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -25,10 +25,8 @@ public class MjController {
 
     @Autowired
     private RedisTemplate redisTemplate;
-
     @Autowired
-    StringRedisTemplateUtil redisUtil;
-
+    private StringRedisTemplate stringRedisTemplate;
     RestTemplate restTemplate = new RestTemplate();
 
     @GetMapping(value = "/data")
@@ -68,22 +66,6 @@ public class MjController {
         String key = taskid + "-" + openid;
         redisTemplate.opsForValue().set(key, "", 30, TimeUnit.DAYS);
     }
-
-    @PostMapping(value = "test")
-    public void test(){
-        List<String> keys = redisUtil.keys("taskdone-*");
-        log.info("taskdone-*的所有数据keys是：{}",keys);
-        keys.stream().forEach(key->{
-            String taskid = key.split("taskdone-")[1];
-            log.info("taskid={}",taskid);
-            List<String> keys2 = (List<String>) redisTemplate.keys(taskid + "-*");
-            log.info("key2={}",keys2);
-            keys2.stream().forEach(key2->{
-                System.out.println("openid="+key2.split(taskid+"-")[1]);
-            });
-        });
-    }
-
 
     public static void main(String[] args) {
         String response = "[\n" +

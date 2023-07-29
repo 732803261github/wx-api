@@ -59,7 +59,7 @@ public class ImageFetchTask {
                         String replace = string.replace("https://media.discordapp.net", "http://www.ai-assistant.com.cn/api/cnd-discordapp");
                         String url = replace + "?Authorization=9998@xunshu";
                         redisTemplate.opsForValue().getAndDelete(taskid);
-                        redisTemplate.opsForValue().set(taskid, url, 3600, TimeUnit.SECONDS);
+                        redisTemplate.opsForValue().set(taskid, url, 30, TimeUnit.SECONDS);
                     }
                 }
             }

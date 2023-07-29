@@ -46,14 +46,14 @@ public class MjController {
         ).getBody();
         List<String> list = new ArrayList<>();
         JSONArray objects = JSON.parseArray(response);
-        for (Object object : objects) {
-            for (Object attachments : ((JSONObject) object).getJSONArray("attachments")) {
-                String string = ((JSONObject) attachments).getString("proxy_url");
-                String replace = string.replace("https://media.discordapp.net", "http://www.ai-assistant.com.cn/api/cnd-discordapp");
-                list.add(replace + "?Authorization=9998@xunshu");
-            }
-        }
-        return R.ok().put(list);
+//        for (Object object : objects) {
+//            for (Object attachments : ((JSONObject) object).getJSONArray("attachments")) {
+//                String string = ((JSONObject) attachments).getString("proxy_url");
+//                String replace = string.replace("https://media.discordapp.net", "http://www.ai-assistant.com.cn/api/cnd-discordapp");
+//                list.add(replace + "?Authorization=9998@xunshu");
+//            }
+//        }
+        return R.ok().put(objects);
     }
 
     @GetMapping(value = "/getImg")

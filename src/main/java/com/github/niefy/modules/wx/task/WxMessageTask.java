@@ -56,7 +56,6 @@ public class WxMessageTask {
             redisTemplate.delete(taskid);
             redisTemplate.opsForValue().getAndSet(taskid.concat("-").concat(openid),url);
             stringRedisTemplate.delete("taskdone-".concat(taskid));
-            stringRedisTemplate.delete("mj-task::".concat(taskid));
         }
     }
 }

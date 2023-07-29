@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,11 +60,10 @@ public class ImageFetchTask {
                 for (Object attachments : ((JSONObject) object).getJSONArray("attachments")) {
                     String taskid = ((JSONObject) object).getString("content").split("]")[0].substring(3);
                     boolean isNumeric = taskid.matches("\\d+");
-                    if (isNumeric && StringUtils.isEmpty(((JSONObject) object).getString("webhook_id")) && ObjectUtils.isEmpty(stringRedisTemplate.opsForValue().get(taskid))) {
+                    if (isNumeric && StringUtils.isEmpty(((JSONObject) object).getString("webhook_id")) && !CollectionUtils.isEmpty(stringRedisTemplate.keys("taskdone-".concat(taskid)))) {
                         String string = ((JSONObject) attachments).getString("proxy_url");
                         String replace = string.replace("https://media.discordapp.net", "http://www.ai-assistant.com.cn/api/cnd-discordapp");
                         String url = replace + "?Authorization=9998@xunshu";
-                        redisTemplate.opsForValue().getAndDelete(taskid);
                         redisTemplate.opsForValue().set(taskid, url, 30, TimeUnit.SECONDS);
                     }
                 }

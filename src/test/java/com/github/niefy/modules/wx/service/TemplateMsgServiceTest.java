@@ -7,6 +7,9 @@ import me.chanjar.weixin.mp.util.WxMpConfigStorageHolder;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -19,6 +22,8 @@ import java.util.List;
 class TemplateMsgServiceTest {
     @Autowired
     TemplateMsgService templateMsgService;
+    @Autowired
+    StringRedisTemplate redisTemplate;
 
     /**
      * 发送模板消息给用户
@@ -40,5 +45,12 @@ class TemplateMsgServiceTest {
             .data(data)
             .build();
         templateMsgService.sendTemplateMsg(wxMpTemplateMessage,appid);
+    }
+
+    @Test
+    void redisTest(){
+        String key = "9244402853440658";
+        ValueOperations valueOperations = redisTemplate.opsForValue();
+        redisTemplate.delete(key);
     }
 }

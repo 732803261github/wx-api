@@ -18,6 +18,7 @@ public class WxMessageTask {
 
     @Autowired
     RedisTemplate redisTemplate;
+
     @Autowired
     StringRedisTemplate stringRedisTemplate;
 
@@ -42,7 +43,7 @@ public class WxMessageTask {
     void sendTemplateMsg(String openid,String taskid) {
         String appid = String.valueOf(redisTemplate.opsForValue().get("appid"));
         List<WxMpTemplateData> data = new ArrayList<>();
-        data.add(new WxMpTemplateData("character_string2", "3878599093670556"));
+        data.add(new WxMpTemplateData("character_string2", taskid));
         data.add(new WxMpTemplateData("time3", DateUtils.format(new Date(), "yyyy-MM-dd HH:mm")));
         String url = redisTemplate.opsForValue().get(taskid).toString();
         log.info("{},{},{}",openid,taskid,url);
@@ -54,8 +55,8 @@ public class WxMessageTask {
                 .build();
 //        templateMsgService.sendTemplateMsg(wxMpTemplateMessage, appid);
         redisTemplate.delete(taskid);
-        redisTemplate.delete("taskdone-".concat(taskid));
         redisTemplate.delete(taskid.concat("-").concat(openid));
+        stringRedisTemplate.delete("taskdone-".concat(taskid));
 
     }
 }

@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.niefy.common.utils.R;
+import com.github.niefy.modules.wx.aspect.Limiting;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,6 +58,7 @@ public class MjController {
         return R.ok().put(objects);
     }
 
+    @Limiting(limitNum = 500, name = "getImgLimit")
     @PostMapping(value = "/getImg")
     public R getImg(HttpServletRequest request) {
         List<String> taskids = Arrays.asList(request.getParameterMap().get("taskids[]"));

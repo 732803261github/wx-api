@@ -59,13 +59,9 @@ public class ImageFetchTask {
                 for (Object attachments : ((JSONObject) object).getJSONArray("attachments")) {
                     String taskid = ((JSONObject) object).getString("content").split("]")[0].substring(3);
                     boolean isNumeric = taskid.matches("\\d+");
-                    String bindKey = taskid.concat("-*");
-                    List<String> key = new ArrayList<>(redisTemplate.keys(bindKey));
-                    Boolean noBind = true;
-                    if(key.size()>0){
-                        noBind = StringUtils.isBlank(redisTemplate.opsForValue().get(key.get(0)).toString());
-                    }
-                    if (isNumeric && StringUtils.isEmpty(((JSONObject) object).getString("webhook_id")) && noBind) {
+                    String bindKey = "taskdone-".concat(taskid);
+                    List<String> key = new ArrayList<>(stringRedisTemplate.keys(bindKey));
+                    if (isNumeric && StringUtils.isEmpty(((JSONObject) object).getString("webhook_id")) && key.size()!=0) {
                         String string = ((JSONObject) attachments).getString("proxy_url");
                         String replace = string.replace("https://media.discordapp.net", "http://www.ai-assistant.com.cn/api/cnd-discordapp");
                         String url = replace + "?Authorization=9998@xunshu";

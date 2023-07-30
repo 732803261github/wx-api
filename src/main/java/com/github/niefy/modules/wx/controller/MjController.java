@@ -12,11 +12,13 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpRequest;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -55,8 +57,10 @@ public class MjController {
         return R.ok().put(objects);
     }
 
-    @GetMapping(value = "/fetchImgById")
-    public R getImg(String openid, List<String> taskids) {
+    @PostMapping(value = "/getImg")
+    public R getImg(HttpServletRequest request) {
+        List<String> taskids = Arrays.asList(request.getParameterMap().get("taskids[]"));
+        String openid = request.getParameter("openid");
         Map<String, Object> map = new HashMap<>();
         taskids.stream().forEach(taskid -> {
             String key = taskid.concat("-").concat(openid);
@@ -66,12 +70,6 @@ public class MjController {
             }
         });
         return R.ok().put(map);
-    }
-
-    @PostMapping(value = "/bind/task")
-    public void bindTask(String openid, String taskid) {
-        String key = taskid + "-" + openid;
-        redisTemplate.opsForValue().set(key, "", 30, TimeUnit.DAYS);
     }
 
     public static void main(String[] args) {

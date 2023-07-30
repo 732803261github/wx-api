@@ -17,8 +17,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Component
@@ -60,7 +59,13 @@ public class ImageFetchTask {
                 for (Object attachments : ((JSONObject) object).getJSONArray("attachments")) {
                     String taskid = ((JSONObject) object).getString("content").split("]")[0].substring(3);
                     boolean isNumeric = taskid.matches("\\d+");
-                    if (isNumeric && StringUtils.isEmpty(((JSONObject) object).getString("webhook_id"))) {
+                    String bindKey = taskid.concat("-*");
+                    List<String> key = new ArrayList<>(redisTemplate.keys(bindKey));
+                    Boolean noBind = true;
+                    if(key.size()>0){
+                        noBind = StringUtils.isBlank(redisTemplate.opsForValue().get(key.get(0)).toString());
+                    }
+                    if (isNumeric && StringUtils.isEmpty(((JSONObject) object).getString("webhook_id")) && noBind) {
                         String string = ((JSONObject) attachments).getString("proxy_url");
                         String replace = string.replace("https://media.discordapp.net", "http://www.ai-assistant.com.cn/api/cnd-discordapp");
                         String url = replace + "?Authorization=9998@xunshu";

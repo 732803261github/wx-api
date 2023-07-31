@@ -82,7 +82,7 @@ public class WxApiController {
         return R.error();
     }
 
-    @PostMapping(value = "/mobile/auth")
+    @GetMapping(value = "/mobile/auth")
     public R invoke(String code) {
         String appid = redisTemplate.opsForValue().get("appid").toString();
         String secret = redisTemplate.opsForValue().get("secret").toString();

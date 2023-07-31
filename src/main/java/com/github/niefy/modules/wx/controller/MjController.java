@@ -61,17 +61,21 @@ public class MjController {
     @Limiting(limitNum = 500, name = "getImgLimit")
     @PostMapping(value = "/getImg")
     public R getImg(HttpServletRequest request) {
-        List<String> taskids = Arrays.asList(request.getParameterMap().get("taskids[]"));
-        String openid = request.getParameter("openid");
-        Map<String, Object> map = new HashMap<>();
-        taskids.stream().forEach(taskid -> {
-            String key = taskid.concat("-").concat(openid);
-            if (ObjectUtils.isNotEmpty(redisTemplate.opsForValue().get(key))) {
-                String s = String.valueOf(redisTemplate.opsForValue().get(key));
-                map.put(taskid, s);
-            }
-        });
-        return R.ok().put(map);
+        if (ObjectUtils.isNotEmpty(request.getParameterMap().get("taskids[]"))) {
+            List<String> taskids = Arrays.asList(request.getParameterMap().get("taskids[]"));
+            String openid = request.getParameter("openid");
+            Map<String, Object> map = new HashMap<>();
+            taskids.stream().forEach(taskid -> {
+                String key = taskid.concat("-").concat(openid);
+                if (ObjectUtils.isNotEmpty(redisTemplate.opsForValue().get(key))) {
+                    String s = String.valueOf(redisTemplate.opsForValue().get(key));
+                    map.put(taskid, s);
+                }
+            });
+            return R.ok().put(map);
+        } else {
+            return R.ok();
+        }
     }
 
     public static void main(String[] args) {

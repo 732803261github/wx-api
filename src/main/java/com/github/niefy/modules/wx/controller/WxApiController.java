@@ -93,18 +93,8 @@ public class WxApiController {
                 "&grant_type=authorization_code";
         ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
         if (response.getStatusCodeValue() == 200) {
-            JSONObject jsonObject = JSON.parseObject(response.getBody());
-            log.info("jsonObject====" + jsonObject);
-            String access_token = jsonObject.getString("access_token");
-            String openid = jsonObject.getString("openid");
-            //拉取用户信息
-            String userInfoUrl = "https://api.weixin.qq.com/sns/userinfo?" +
-                    "access_token=" + access_token +
-                    "&openid=" + openid +
-                    "&lang=zh_CN";
-            ResponseEntity<String> response2 = restTemplate.getForEntity(userInfoUrl, String.class);
-            JSONObject user = JSONObject.parseObject(response2.getBody());
-            log.info("userJson=====" + user);
+            JSONObject user = JSON.parseObject(response.getBody());
+            log.info("snsapi_base info===" + user);
             return R.ok().put(user);
         }
         return R.error().put(JSON.parseObject(response.getBody()));

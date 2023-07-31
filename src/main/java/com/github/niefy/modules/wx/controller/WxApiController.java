@@ -82,6 +82,34 @@ public class WxApiController {
         return R.error();
     }
 
+    @PostMapping(value = "/mobile/auth")
+    public R invoke(String code) {
+        String appid = redisTemplate.opsForValue().get("appid").toString();
+        String secret = redisTemplate.opsForValue().get("secret").toString();
+        String url = "https://api.weixin.qq.com/sns/oauth2/access_token?" +
+                "appid=" + appid +
+                "&secret=" + secret +
+                "&code=" + code +
+                "&grant_type=authorization_code";
+        ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+        if (response.getStatusCodeValue() == 200 && JSON.parseObject(response.getBody()).getInteger("errcode")==0) {
+            JSONObject jsonObject = JSON.parseObject(response.getBody());
+            log.info("jsonObject====" + jsonObject);
+            String access_token = jsonObject.getString("access_token");
+            String openid = jsonObject.getString("openid");
+            //拉取用户信息
+            String userInfoUrl = "https://api.weixin.qq.com/sns/userinfo?" +
+                    "access_token=" + access_token +
+                    "&openid=" + openid +
+                    "&lang=zh_CN";
+            ResponseEntity<String> response2 = restTemplate.getForEntity(userInfoUrl, String.class);
+            JSONObject user = JSONObject.parseObject(response2.getBody());
+            log.info("userJson=====" + user);
+            return R.ok().put(user);
+        }
+        return R.error().put(JSON.parseObject(response.getBody()));
+    }
+
     public static void main(String[] args) throws UnsupportedEncodingException {
         Random random = new Random();
         int randomInt = random.nextInt();

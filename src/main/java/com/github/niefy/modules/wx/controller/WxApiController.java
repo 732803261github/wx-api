@@ -92,7 +92,7 @@ public class WxApiController {
                 "&code=" + code +
                 "&grant_type=authorization_code";
         ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
-        if (response.getStatusCodeValue() == 200 && JSON.parseObject(response.getBody()).getInteger("errcode")==0) {
+        if (response.getStatusCodeValue() == 200) {
             JSONObject jsonObject = JSON.parseObject(response.getBody());
             log.info("jsonObject====" + jsonObject);
             String access_token = jsonObject.getString("access_token");

@@ -47,20 +47,29 @@ public class MsgHandler extends AbstractHandler {
                                     Map<String, Object> context, WxMpService wxMpService,
                                     WxSessionManager sessionManager) {
         logger.info("监听到公众号后台用户消息");
-        logger.info("{},{}",wxMessage.getContent(),wxMessage.getContent().substring(0,4).trim().equals("@gpt"));
-        String prompt = wxMessage.getContent().substring(4);
-        askGPT(prompt);
+        logger.info("{}",wxMessage.getContent());
         String textContent = wxMessage.getContent();
         String fromUser = wxMessage.getFromUser();
         String appid = WxMpConfigStorageHolder.get();
-        boolean autoReplyed = msgReplyService.tryAutoReply(appid,false, fromUser, textContent);
-        //当用户输入关键词如“你好”，“客服”等，并且有客服在线时，把消息转发给在线客服
-        if (TRANSFER_CUSTOMER_SERVICE_KEY.equals(textContent) || !autoReplyed) {
+        if(wxMessage.getContent().length()>4 && wxMessage.getContent().substring(0,4).trim().equals("@gpt")){
+            String prompt = wxMessage.getContent().substring(4);
+            logger.info("prompt={}",prompt);
+            String gptResponse = askGPT(prompt);
             wxMsgService.addWxMsg(WxMsg.buildOutMsg(WxConsts.KefuMsgType.TRANSFER_CUSTOMER_SERVICE,fromUser,null));
             return WxMpXmlOutMessage
-                .TRANSFER_CUSTOMER_SERVICE().fromUser(wxMessage.getToUser())
-                .toUser(fromUser).build();
+                    .TRANSFER_CUSTOMER_SERVICE().fromUser(wxMessage.getToUser())
+                    .toUser(fromUser).build();
+        }else {
+            boolean autoReplyed = msgReplyService.tryAutoReply(appid,false, fromUser, textContent);
+            //当用户输入关键词如“你好”，“客服”等，并且有客服在线时，把消息转发给在线客服
+            if (TRANSFER_CUSTOMER_SERVICE_KEY.equals(textContent) || !autoReplyed) {
+                wxMsgService.addWxMsg(WxMsg.buildOutMsg(WxConsts.KefuMsgType.TRANSFER_CUSTOMER_SERVICE,fromUser,null));
+                return WxMpXmlOutMessage
+                        .TRANSFER_CUSTOMER_SERVICE().fromUser(wxMessage.getToUser())
+                        .toUser(fromUser).build();
+            }
         }
+
         return null;
 
     }

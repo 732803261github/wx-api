@@ -77,7 +77,7 @@ public class MsgReplyServiceImpl implements MsgReplyService {
             long delay = 0;
             TaskExcutor.schedule(() -> {
                 wxMpService.switchover(appid);
-                this.reply(toUser,"GPT",gptRes);
+                this.reply(toUser,"TEXT",gptRes);
             }, delay, TimeUnit.MILLISECONDS);
             delay += autoReplyInterval;
             return true;

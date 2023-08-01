@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 
@@ -76,10 +77,13 @@ public class MsgHandler extends AbstractHandler {
 
     public String askGPT(String prompt){
         Map<String, Object> map = new HashMap<>();
-        HttpEntity requestEntity = new HttpEntity(map);
+        map.put("prompt",prompt);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Type", "application/x-www-form-urlencoded");
+        HttpEntity requestEntity = new HttpEntity(map,headers);
         String response = restTemplate.exchange(
-                "http://ai-assistant.com.cn:8081/wxcom/message?prompt="+prompt,
-                HttpMethod.GET,
+                "http://ai-assistant.com.cn:8081/wxcom/message",
+                HttpMethod.POST,
                 requestEntity,
                 String.class
         ).getBody();

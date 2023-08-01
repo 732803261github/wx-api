@@ -51,7 +51,7 @@ public class MsgHandler extends AbstractHandler {
         String textContent = wxMessage.getContent();
         String fromUser = wxMessage.getFromUser();
         String appid = WxMpConfigStorageHolder.get();
-        if(wxMessage.getContent().length()>4 && wxMessage.getContent().substring(0,4).trim().equals("@gpt")){
+        if(wxMessage.getContent().length()>4 && wxMessage.getContent().substring(0,4).trim().toLowerCase().equals("@gpt")){
             String prompt = wxMessage.getContent().substring(4);
             logger.info("prompt={}",prompt);
             String gptResponse = askGPT(prompt);
@@ -75,13 +75,11 @@ public class MsgHandler extends AbstractHandler {
     }
 
     public String askGPT(String prompt){
-        logger.info(prompt);
         Map<String, Object> map = new HashMap<>();
-        map.put("prompt",prompt);
         HttpEntity requestEntity = new HttpEntity(map);
         String response = restTemplate.exchange(
-                "http://ai-assistant.com.cn:8081/wxcom/message",
-                HttpMethod.POST,
+                "http://ai-assistant.com.cn:8081/wxcom/message?prompt="+prompt,
+                HttpMethod.GET,
                 requestEntity,
                 String.class
         ).getBody();

@@ -25,6 +25,8 @@ public interface MsgReplyService {
      */
     boolean tryAutoReply(String appid, boolean exactMatch, String toUser, String keywords);
 
+    boolean gptReturn(String appid, String toUser, String gptRes);
+
     default void reply(String toUser,String replyType, String replyContent){
         try {
             if (WxConsts.KefuMsgType.TEXT.equals(replyType)) {

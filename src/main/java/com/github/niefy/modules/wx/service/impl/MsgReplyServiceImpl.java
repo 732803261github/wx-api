@@ -72,6 +72,21 @@ public class MsgReplyServiceImpl implements MsgReplyService {
         return false;
     }
 
+    public boolean gptReturn(String appid, String toUser, String gptRes){
+        try {
+            long delay = 0;
+            TaskExcutor.schedule(() -> {
+                wxMpService.switchover(appid);
+                this.reply(toUser,"GPT",gptRes);
+            }, delay, TimeUnit.MILLISECONDS);
+            delay += autoReplyInterval;
+            return true;
+        } catch (Exception e) {
+            log.error("gpt自动回复出错：", e);
+        }
+        return false;
+    }
+
     @Override
     public void replyText(String toUser, String content) throws WxErrorException {
         wxMpService.getKefuService().sendKefuMessage(WxMpKefuMessage.TEXT().toUser(toUser).content(content).build());

@@ -46,15 +46,14 @@ public class MsgHandler extends AbstractHandler {
     public WxMpXmlOutMessage handle(WxMpXmlMessage wxMessage,
                                     Map<String, Object> context, WxMpService wxMpService,
                                     WxSessionManager sessionManager) {
-        logger.info("监听到公众号后台用户消息");
-        logger.info("{}",wxMessage.getContent());
+        logger.info("监听到公众号后台用户消息={}",wxMessage.getContent());
         String textContent = wxMessage.getContent();
         String fromUser = wxMessage.getFromUser();
         String appid = WxMpConfigStorageHolder.get();
         if(wxMessage.getContent().length()>4 && wxMessage.getContent().substring(0,4).trim().toLowerCase().equals("@gpt")){
             String prompt = wxMessage.getContent().substring(4);
-            logger.info("prompt={}",prompt);
             String gptResponse = askGPT(prompt);
+            msgReplyService.gptReturn(appid, fromUser, gptResponse);
             wxMsgService.addWxMsg(WxMsg.buildOutMsg(WxConsts.KefuMsgType.TRANSFER_CUSTOMER_SERVICE,fromUser,null));
             return WxMpXmlOutMessage
                     .TRANSFER_CUSTOMER_SERVICE().fromUser(wxMessage.getToUser())
@@ -86,9 +85,6 @@ public class MsgHandler extends AbstractHandler {
                 requestEntity,
                 String.class
         ).getBody();
-        logger.info("response:{}",response);
-        logger.info("response2:{}",JSON.parseObject(response));
-        return "";
+        return JSON.parseObject(response).getString("content");
     }
-
 }

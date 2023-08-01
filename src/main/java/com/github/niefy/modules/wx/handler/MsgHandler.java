@@ -1,10 +1,7 @@
 package com.github.niefy.modules.wx.handler;
 
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import com.alibaba.fastjson.JSON;
@@ -28,6 +25,8 @@ import me.chanjar.weixin.common.session.WxSessionManager;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlMessage;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlOutMessage;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -76,8 +75,8 @@ public class MsgHandler extends AbstractHandler {
     }
 
     public String askGPT(String prompt){
-        Map<String, Object> map = new HashMap<>();
-        map.put("prompt",prompt);
+        MultiValueMap<String,Object> map = new LinkedMultiValueMap();
+        map.put("prompt", Arrays.asList(prompt));
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/x-www-form-urlencoded");
         HttpEntity requestEntity = new HttpEntity(map,headers);

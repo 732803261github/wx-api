@@ -74,12 +74,10 @@ public class MsgReplyServiceImpl implements MsgReplyService {
 
     public boolean gptReturn(String appid,String replyType, String toUser, String gptRes){
         try {
-            long delay = 0;
             TaskExcutor.schedule(() -> {
                 wxMpService.switchover(appid);
                 this.reply(toUser,replyType,gptRes);
-            }, delay, TimeUnit.MILLISECONDS);
-            delay += autoReplyInterval;
+            }, 0, TimeUnit.MILLISECONDS);
             return true;
         } catch (Exception e) {
             log.error("gpt自动回复出错：", e);

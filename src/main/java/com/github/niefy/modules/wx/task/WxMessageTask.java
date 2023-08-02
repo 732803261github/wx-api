@@ -26,7 +26,7 @@ public class WxMessageTask {
     @Autowired
     private TemplateMsgService templateMsgService;
 
-    @Scheduled(cron = "0/10 * * * * ?")
+//    @Scheduled(cron = "0/10 * * * * ?")
     public void message() {
         List<String> keys = new ArrayList<>(stringRedisTemplate.keys("taskdone-*"));
         keys.stream().forEach(key -> {

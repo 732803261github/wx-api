@@ -60,9 +60,8 @@ public class MsgHandler extends AbstractHandler {
                     .toUser(fromUser).build();
         } else if (wxMessage.getContent().length()>4 && wxMessage.getContent().substring(0,4).trim().toLowerCase().equals("@img")) {
             String prompt = wxMessage.getContent().substring(4);
-//            String midjourneyUrl = genImg(prompt);
-            String midjourneyUrl = "http://www.ai-assistant.com.cn/api/cnd-discordapp/attachments/1134012605736960053/1135480729564872755/gmartin7404_0014326091328057_Simple-minded_person_d7448785-54f8-4439-bf72-7761afa71362.png?Authorization=9998@xunshu";
-            String imgUrl = String.format("<a href=\"%s\">%s</a>", midjourneyUrl, prompt);
+            String img = genImg(prompt);
+            String imgUrl = String.format("<a href=\"%s\">%s</a>", img, prompt);
             msgReplyService.gptReturn(appid,"text", fromUser, imgUrl);
             wxMsgService.addWxMsg(WxMsg.buildOutMsg(WxConsts.KefuMsgType.TEXT,fromUser,null));
             return WxMpXmlOutMessage

@@ -53,12 +53,21 @@ public class MsgHandler extends AbstractHandler {
         if(wxMessage.getContent().length()>4 && wxMessage.getContent().substring(0,4).trim().toLowerCase().equals("@gpt")){
             String prompt = wxMessage.getContent().substring(4);
             String gptResponse = askGPT(prompt);
-            msgReplyService.gptReturn(appid, fromUser, gptResponse);
+            msgReplyService.gptReturn(appid,"text", fromUser, gptResponse);
             wxMsgService.addWxMsg(WxMsg.buildOutMsg(WxConsts.KefuMsgType.TRANSFER_CUSTOMER_SERVICE,fromUser,null));
             return WxMpXmlOutMessage
                     .TRANSFER_CUSTOMER_SERVICE().fromUser(wxMessage.getToUser())
                     .toUser(fromUser).build();
-        }else {
+        } else if (wxMessage.getContent().length()>4 && wxMessage.getContent().substring(0,4).trim().toLowerCase().equals("@img")) {
+            String prompt = wxMessage.getContent().substring(4);
+//            String midjourneyUrl = genImg(prompt);
+            String midjourneyUrl = "http://www.ai-assistant.com.cn/api/cnd-discordapp/attachments/1134012605736960053/1135480729564872755/gmartin7404_0014326091328057_Simple-minded_person_d7448785-54f8-4439-bf72-7761afa71362.png?Authorization=9998@xunshu";
+            msgReplyService.gptReturn(appid,"image", fromUser, midjourneyUrl);
+            wxMsgService.addWxMsg(WxMsg.buildOutMsg(WxConsts.KefuMsgType.TRANSFER_CUSTOMER_SERVICE,fromUser,null));
+            return WxMpXmlOutMessage
+                    .TRANSFER_CUSTOMER_SERVICE().fromUser(wxMessage.getToUser())
+                    .toUser(fromUser).build();
+        } else {
             boolean autoReplyed = msgReplyService.tryAutoReply(appid,false, fromUser, textContent);
             //当用户输入关键词如“你好”，“客服”等，并且有客服在线时，把消息转发给在线客服
             if (TRANSFER_CUSTOMER_SERVICE_KEY.equals(textContent) || !autoReplyed) {
@@ -87,4 +96,19 @@ public class MsgHandler extends AbstractHandler {
         ).getBody();
         return JSON.parseObject(response).getString("content");
     }
+    public String genImg(String prompt){
+        MultiValueMap<String,Object> map = new LinkedMultiValueMap();
+        map.put("prompt", Arrays.asList(prompt));
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Type", "application/x-www-form-urlencoded");
+        HttpEntity requestEntity = new HttpEntity(map,headers);
+        String response = restTemplate.exchange(
+                "http://ai-assistant.com.cn:8088/wxcom/img",
+                HttpMethod.POST,
+                requestEntity,
+                String.class
+        ).getBody();
+        return JSON.parseObject(response).getString("content");
+    }
+
 }

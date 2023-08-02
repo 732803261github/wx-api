@@ -61,9 +61,11 @@ public class MsgHandler extends AbstractHandler {
                     .toUser(fromUser).build();
         } else if (wxMessage.getContent().length()>4 && wxMessage.getContent().substring(0,4).trim().toLowerCase().equals("@img")) {
             String prompt = wxMessage.getContent().substring(4);
-//            String img = genImg(prompt,wxMessage.getFromUser());
-            genImg(prompt,wxMessage.getFromUser());
-            String imgUrl = String.format("<a href=\"%s\">%s</a>", "img", prompt);
+            JSONObject res = genImg(prompt,wxMessage.getFromUser());
+            String imgUrl = String.format("%s图片生成中，系统即将返回生成结果...", prompt);
+            if(!res.getString("code").equals("1")){
+                imgUrl = res.getString("description");
+            }
             msgReplyService.gptReturn(appid,"text", fromUser, imgUrl);
             wxMsgService.addWxMsg(WxMsg.buildOutMsg(WxConsts.KefuMsgType.TEXT,fromUser,null));
             return WxMpXmlOutMessage

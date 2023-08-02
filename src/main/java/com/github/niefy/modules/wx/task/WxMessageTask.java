@@ -21,14 +21,11 @@ public class WxMessageTask {
     RedisTemplate redisTemplate;
 
     @Autowired
-    StringRedisTemplate stringRedisTemplate;
-
-    @Autowired
     private TemplateMsgService templateMsgService;
 
-//    @Scheduled(cron = "0/10 * * * * ?")
+    @Scheduled(cron = "0/10 * * * * ?")
     public void message() {
-        List<String> keys = new ArrayList<>(stringRedisTemplate.keys("taskdone-*"));
+        List<String> keys = new ArrayList<>(redisTemplate.keys("taskdone-*"));
         keys.stream().forEach(key -> {
             String taskid = key.split("taskdone-")[1];
             List<String> keys2 = new ArrayList<String>(redisTemplate.keys(taskid.concat("-*")));
@@ -55,7 +52,7 @@ public class WxMessageTask {
             templateMsgService.sendTemplateMsg(wxMpTemplateMessage, appid);
             redisTemplate.opsForValue().getAndSet(taskid.concat("-").concat(openid),url);
             redisTemplate.delete(taskid);
-            stringRedisTemplate.delete("taskdone-".concat(taskid));
+            redisTemplate.delete("taskdone-".concat(taskid));
         }
     }
 }

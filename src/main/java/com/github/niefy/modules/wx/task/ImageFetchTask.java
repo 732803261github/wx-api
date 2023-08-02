@@ -9,7 +9,6 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -27,12 +26,9 @@ public class ImageFetchTask {
     @Autowired
     RedisTemplate redisTemplate;
 
-    @Autowired
-    StringRedisTemplate stringRedisTemplate;
-
     RestTemplate restTemplate = new RestTemplate();
 
-//    @Scheduled(cron = "0/10 * * * * ?")
+    @Scheduled(cron = "0/10 * * * * ?")
     public void cacheImgUrl() {
         String lastId = String.valueOf(redisTemplate.opsForValue().get("lastId"));
         String authorization = String.valueOf(redisTemplate.opsForValue().get("authorization"));
@@ -60,7 +56,7 @@ public class ImageFetchTask {
                     String taskid = ((JSONObject) object).getString("content").split("]")[0].substring(3);
                     boolean isNumeric = taskid.matches("\\d+");
                     String bindKey = "taskdone-".concat(taskid);
-                    List<String> key = new ArrayList<>(stringRedisTemplate.keys(bindKey));
+                    List<String> key = new ArrayList<>(redisTemplate.keys(bindKey));
                     if (isNumeric && StringUtils.isEmpty(((JSONObject) object).getString("webhook_id")) && key.size()!=0) {
                         String string = ((JSONObject) attachments).getString("proxy_url");
                         String replace = string.replace("https://media.discordapp.net", "http://www.ai-assistant.com.cn/api/cnd-discordapp");

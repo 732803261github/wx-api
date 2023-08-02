@@ -54,18 +54,18 @@ public class MsgHandler extends AbstractHandler {
             String prompt = wxMessage.getContent().substring(4);
             String gptResponse = askGPT(prompt);
             msgReplyService.gptReturn(appid,"text", fromUser, gptResponse);
-            wxMsgService.addWxMsg(WxMsg.buildOutMsg(WxConsts.KefuMsgType.TRANSFER_CUSTOMER_SERVICE,fromUser,null));
+            wxMsgService.addWxMsg(WxMsg.buildOutMsg(WxConsts.KefuMsgType.TEXT,fromUser,null));
             return WxMpXmlOutMessage
-                    .TRANSFER_CUSTOMER_SERVICE().fromUser(wxMessage.getToUser())
+                    .TEXT().fromUser(wxMessage.getToUser())
                     .toUser(fromUser).build();
         } else if (wxMessage.getContent().length()>4 && wxMessage.getContent().substring(0,4).trim().toLowerCase().equals("@img")) {
             String prompt = wxMessage.getContent().substring(4);
 //            String midjourneyUrl = genImg(prompt);
-            String midjourneyUrl = "http://www.ai-assistant.com.cn/api/cnd-discordapp/attachments/1134012605736960053/1135480729564872755/gmartin7404_0014326091328057_Simple-minded_person_d7448785-54f8-4439-bf72-7761afa71362.png?Authorization=9998@xunshu";
-            msgReplyService.gptReturn(appid,"image", fromUser, midjourneyUrl);
-            wxMsgService.addWxMsg(WxMsg.buildOutMsg(WxConsts.KefuMsgType.IMAGE,fromUser,null));
+            String midjourneyUrl = "<a href=\"http://www.ai-assistant.com.cn/api/cnd-discordapp/attachments/1134012605736960053/1135480729564872755/gmartin7404_0014326091328057_Simple-minded_person_d7448785-54f8-4439-bf72-7761afa71362.png?Authorization=9998@xunshu\">prompt</a>";
+            msgReplyService.gptReturn(appid,"text", fromUser, midjourneyUrl);
+            wxMsgService.addWxMsg(WxMsg.buildOutMsg(WxConsts.KefuMsgType.TEXT,fromUser,null));
             return WxMpXmlOutMessage
-                    .IMAGE().fromUser(wxMessage.getToUser())
+                    .TRANSFER_CUSTOMER_SERVICE().fromUser(wxMessage.getToUser())
                     .toUser(fromUser).build();
         } else {
             boolean autoReplyed = msgReplyService.tryAutoReply(appid,false, fromUser, textContent);

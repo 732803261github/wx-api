@@ -6,6 +6,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.github.niefy.config.TaskExcutor;
 import com.github.niefy.modules.wx.entity.MsgReplyRule;
 import com.github.niefy.modules.wx.entity.WxMsg;
@@ -60,8 +61,9 @@ public class MsgHandler extends AbstractHandler {
                     .toUser(fromUser).build();
         } else if (wxMessage.getContent().length()>4 && wxMessage.getContent().substring(0,4).trim().toLowerCase().equals("@img")) {
             String prompt = wxMessage.getContent().substring(4);
-            String img = genImg(prompt);
-            String imgUrl = String.format("<a href=\"%s\">%s</a>", img, prompt);
+//            String img = genImg(prompt,wxMessage.getFromUser());
+            genImg(prompt,wxMessage.getFromUser());
+            String imgUrl = String.format("<a href=\"%s\">%s</a>", "img", prompt);
             msgReplyService.gptReturn(appid,"text", fromUser, imgUrl);
             wxMsgService.addWxMsg(WxMsg.buildOutMsg(WxConsts.KefuMsgType.TEXT,fromUser,null));
             return WxMpXmlOutMessage
@@ -96,19 +98,21 @@ public class MsgHandler extends AbstractHandler {
         ).getBody();
         return JSON.parseObject(response).getString("content");
     }
-    public String genImg(String prompt){
-        MultiValueMap<String,Object> map = new LinkedMultiValueMap();
-        map.put("prompt", Arrays.asList(prompt));
+    public JSONObject genImg(String prompt, String openid){
+        Map<String,Object> map = new HashMap<>();
+        map.put("prompt", prompt);
+        map.put("openid",openid);
+        map.put("base64",null);
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Type", "application/x-www-form-urlencoded");
         HttpEntity requestEntity = new HttpEntity(map,headers);
         String response = restTemplate.exchange(
-                "http://ai-assistant.com.cn:8088/wxcom/img",
+                "http://ai-assistant.com.cn:8080/mj/submit/imagine",
                 HttpMethod.POST,
                 requestEntity,
                 String.class
         ).getBody();
-        return JSON.parseObject(response).getString("content");
+        logger.info("response:{}",JSON.parseObject(response));
+        return JSON.parseObject(response);
     }
 
 }

@@ -66,7 +66,7 @@ public class WxApiController {
 
     @PostMapping("/authInfo")
     public R checkUserSubscribe(String openid) {
-        String key = "authInfo::" + openid;
+        String key = openid;
         if (redisTemplate.opsForValue().get(key) == null) {
             WxUser wxUser = userService.getById(openid);
             if (ObjectUtils.isNotEmpty(wxUser)) {

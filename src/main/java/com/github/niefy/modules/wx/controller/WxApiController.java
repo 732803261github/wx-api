@@ -67,12 +67,10 @@ public class WxApiController {
     @PostMapping("/authInfo")
     public R checkUserSubscribe(String openid) {
         String key = openid;
-        log.info("redisTemplate.opsForValue().get(key)==null:{}",redisTemplate.opsForValue().get(key)==null);
-        log.info("authinfo-{},{}",openid,redisTemplate.opsForValue().get(key));
         if (redisTemplate.opsForValue().get(key) == null) {
             WxUser wxUser = userService.getById(openid);
             if (ObjectUtils.isNotEmpty(wxUser)) {
-                redisTemplate.opsForValue().set(key, wxUser, 30, TimeUnit.SECONDS);
+                redisTemplate.opsForValue().set(key, JSONObject.toJSONString(wxUser), 30, TimeUnit.SECONDS);
                 return R.ok().put(wxUser);
             }
         } else {

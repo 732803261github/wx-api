@@ -23,7 +23,7 @@ public class OpenaiController {
         log.info("apiKey:{}", apiKey);
         List<String> keys = Arrays.asList(redisTemplate.opsForValue().get("keys").toString().split(","));
         keys.forEach(key -> {
-            String hashKey = DigestUtils.sha1Hex(key);
+            String hashKey = DigestUtils.md5Hex(key);
             if (hashKey.equals(apiKey)) {
                 String dayUseKey = DateUtils.format(new Date(), "yyyy-MM-dd").concat("||").concat(key);
                 increKey(key,dayUseKey);

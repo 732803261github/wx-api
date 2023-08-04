@@ -52,7 +52,7 @@ public class MsgHandler extends AbstractHandler {
         String fromUser = wxMessage.getFromUser();
         String appid = WxMpConfigStorageHolder.get();
         if(wxMessage.getContent().length()>4 && wxMessage.getContent().substring(0,4).trim().toLowerCase().equals("@gpt")){
-            String prompt = wxMessage.getContent().substring(4);
+            String prompt = wxMessage.getContent().substring(4).trim();
             String gptResponse = askGPT(prompt);
             msgReplyService.gptReturn(appid,"text", fromUser, gptResponse);
             wxMsgService.addWxMsg(WxMsg.buildOutMsg(WxConsts.KefuMsgType.TRANSFER_CUSTOMER_SERVICE,fromUser,null));
@@ -60,7 +60,7 @@ public class MsgHandler extends AbstractHandler {
                     .TRANSFER_CUSTOMER_SERVICE().fromUser(wxMessage.getToUser())
                     .toUser(fromUser).build();
         } else if (wxMessage.getContent().length()>4 && wxMessage.getContent().substring(0,4).trim().toLowerCase().equals("@img")) {
-            String prompt = wxMessage.getContent().substring(4);
+            String prompt = wxMessage.getContent().substring(4).trim();
             JSONObject res = genImg(prompt,wxMessage.getFromUser());
             String imgUrl = String.format("%s\n%s生成中，系统即将返回生成结果...",res.getString("result"),prompt);
             if(!res.getString("code").equals("1")){

@@ -81,7 +81,7 @@ public class MsgHandler extends AbstractHandler {
                         .toUser(fromUser).build();
             }
         }
-
+        msgReplyService.gptReturn(appid,"text", fromUser, "你好，消息内容超过微信限制，请使用网页应用请求");
         return null;
 
     }
@@ -92,6 +92,7 @@ public class MsgHandler extends AbstractHandler {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/x-www-form-urlencoded");
         HttpEntity requestEntity = new HttpEntity(map,headers);
+        //python接口服务
         String response = restTemplate.exchange(
                 "http://ai-assistant.com.cn:8081/wxcom/message",
                 HttpMethod.POST,

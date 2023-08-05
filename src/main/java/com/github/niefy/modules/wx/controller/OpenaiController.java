@@ -20,11 +20,10 @@ public class OpenaiController {
 
     @PostMapping(value = "/record")
     public void recordApikey(String apiKey, String openid) {
-        log.info("apiKey:{}", apiKey);
+        log.info("key:{},openid:{}", apiKey,openid);
         List<String> keys = Arrays.asList(redisTemplate.opsForValue().get("keys").toString().split(","));
         keys.forEach(key -> {
-            String hashKey = DigestUtils.sha1Hex(key);
-            if (hashKey.equals(apiKey)) {
+            if (key.equals(apiKey)) {
                 String dayUseKey = DateUtils.format(new Date(), "yyyy-MM-dd").concat("||").concat(key);
                 increKey(key,dayUseKey);
                 String userDayUseKey = DateUtils.format(new Date(), "yyyy-MM-dd").concat("||").concat(key);

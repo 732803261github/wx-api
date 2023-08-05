@@ -64,10 +64,12 @@ public class MjController {
             Map<String, Object> map = new HashMap<>();
             taskids.stream().forEach(taskid -> {
                 String key = taskid.concat("-").concat(openid);
-                String url = redisTemplate.opsForValue().get(key).toString();
-                if (ObjectUtils.isNotEmpty(redisTemplate.opsForValue().get(key)) && url.startsWith("http")) {
-                    String s = String.valueOf(redisTemplate.opsForValue().get(key));
-                    map.put(taskid, s);
+                if (ObjectUtils.isNotEmpty(redisTemplate.opsForValue().get(key))) {
+                    String url = redisTemplate.opsForValue().get(key).toString();
+                    if (ObjectUtils.isNotEmpty(redisTemplate.opsForValue().get(key)) && url.startsWith("http")) {
+                        String s = String.valueOf(redisTemplate.opsForValue().get(key));
+                        map.put(taskid, s);
+                    }
                 }
             });
             return R.ok().put(map);

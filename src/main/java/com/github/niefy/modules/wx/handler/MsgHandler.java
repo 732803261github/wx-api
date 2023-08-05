@@ -53,7 +53,7 @@ public class MsgHandler extends AbstractHandler {
         String appid = WxMpConfigStorageHolder.get();
         if(wxMessage.getContent().length()>4 && wxMessage.getContent().substring(0,4).trim().toLowerCase().equals("@gpt")){
             String prompt = wxMessage.getContent().substring(4).trim();
-            String gptResponse = askGPT(prompt);
+            String gptResponse = askGPT(prompt,wxMessage.getFromUser());
             msgReplyService.gptReturn(appid, "text", fromUser, gptResponse);
             wxMsgService.addWxMsg(WxMsg.buildOutMsg(WxConsts.KefuMsgType.TRANSFER_CUSTOMER_SERVICE,fromUser,null));
             return WxMpXmlOutMessage
@@ -85,9 +85,10 @@ public class MsgHandler extends AbstractHandler {
 
     }
 
-    public String askGPT(String prompt){
+    public String askGPT(String prompt,String openid){
         MultiValueMap<String,Object> map = new LinkedMultiValueMap();
         map.put("prompt", Arrays.asList(prompt));
+        map.put("openid",Arrays.asList(openid));
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/x-www-form-urlencoded");
         HttpEntity requestEntity = new HttpEntity(map,headers);

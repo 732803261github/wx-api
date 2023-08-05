@@ -67,6 +67,7 @@ public class MsgReplyServiceImpl implements MsgReplyService {
             }
             return true;
         } catch (Exception e) {
+            errorCall(appid,toUser);
             log.error("自动回复出错：", e);
         }
         return false;
@@ -80,13 +81,13 @@ public class MsgReplyServiceImpl implements MsgReplyService {
             }, 0, TimeUnit.MILLISECONDS);
             return true;
         } catch (Exception e) {
-            errorCall(appid,toUser);
             log.error("gpt自动回复出错：", e);
         }
         return false;
     }
     public void errorCall(String appid, String toUser){
-        gptReturn(appid,"text", toUser, "你好，消息内容超过微信限制，请使用网页应用请求");
+        wxMpService.switchover(appid);
+        this.reply(toUser,"text","你好，消息内容超过微信限制，请使用网页应用请求");
     }
 
     @Override

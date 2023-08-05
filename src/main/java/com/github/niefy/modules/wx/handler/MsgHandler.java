@@ -54,10 +54,7 @@ public class MsgHandler extends AbstractHandler {
         if(wxMessage.getContent().length()>4 && wxMessage.getContent().substring(0,4).trim().toLowerCase().equals("@gpt")){
             String prompt = wxMessage.getContent().substring(4).trim();
             String gptResponse = askGPT(prompt);
-            boolean res = msgReplyService.gptReturn(appid, "text", fromUser, gptResponse);
-            if(!res){
-                msgReplyService.gptReturn(appid,"text", fromUser, "你好，消息内容超过微信限制，请使用网页应用请求");
-            }
+            msgReplyService.gptReturn(appid, "text", fromUser, gptResponse);
             wxMsgService.addWxMsg(WxMsg.buildOutMsg(WxConsts.KefuMsgType.TRANSFER_CUSTOMER_SERVICE,fromUser,null));
             return WxMpXmlOutMessage
                     .TRANSFER_CUSTOMER_SERVICE().fromUser(wxMessage.getToUser())

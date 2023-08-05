@@ -51,6 +51,12 @@ public interface MsgReplyService {
                 this.replyMsgMenu(toUser, replyContent);
             }
         } catch (Exception e) {
+            try {
+                this.replyText(toUser,"你好，消息内容超过微信限制，请使用在线应用请求");
+            } catch (WxErrorException ex) {
+                logger.info("gpt特殊处理");
+                logger.info(ex.getMessage());
+            }
             logger.error("自动回复出错：", e);
         }
     }

@@ -2,7 +2,6 @@ package com.github.niefy.modules.wx.controller;
 
 import com.github.niefy.common.utils.DateUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -14,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @RestController
-public class OpenaiController {
+public class OpenApiKeyUseStatisticController {
     @Autowired
     private RedisTemplate redisTemplate;
 
@@ -27,7 +26,7 @@ public class OpenaiController {
                 String dayUseKey = DateUtils.format(new Date(), "yyyy-MM-dd").concat("||").concat(key);
                 increKey(key,dayUseKey);
                 String userDayUseKey = DateUtils.format(new Date(), "yyyy-MM-dd").concat("||").concat(key);
-                updateUserRecord("USE-".concat(openid), userDayUseKey);
+                updateUserRecord("USE::".concat(openid), userDayUseKey);
             }
         });
     }

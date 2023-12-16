@@ -32,7 +32,6 @@ public class WxMessageTask {
         keys.stream().forEach(key -> {
             String taskid = redisTemplate.opsForValue().get(key).toString().split("@")[0];
             String openid = redisTemplate.opsForValue().get(key).toString().split("@")[1];
-            log.info("taskid:{},openid:{}",taskid,openid);
             sendTemplateMsg(openid, taskid);
         });
     }
@@ -44,7 +43,7 @@ public class WxMessageTask {
         data.add(new WxMpTemplateData("time3", DateUtils.format(new Date(), "yyyy-MM-dd HH:mm")));
         String key = "mj-task-store::".concat(taskid);
         String delKey = "wxcomImg::".concat(taskid);
-        log.info("key:{},delkey:{}",key,delKey);
+        log.info("redisTemplate.opsForValue().get(key)){}",redisTemplate.opsForValue().get(key));
         if (ObjectUtils.isNotEmpty(redisTemplate.opsForValue().get(key))) {
             String url = JSON.parseObject(redisTemplate.opsForValue().get(key).toString()).getString("imageUrl");
             String s = url.split("\\?ex=")[0];

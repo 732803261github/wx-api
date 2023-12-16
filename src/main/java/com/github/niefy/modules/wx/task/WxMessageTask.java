@@ -44,10 +44,12 @@ public class WxMessageTask {
         String delKey = "wxcomImg::".concat(taskid);
         if (ObjectUtils.isNotEmpty(redisTemplate.opsForValue().get(key))) {
             String url = JSON.parseObject(redisTemplate.opsForValue().get(key).toString()).getString("imageUrl");
+            String s = url.split("\\?ex=")[0];
+            String replace = s.replace("https://cdn.discordapp.com", "http://www.ai-assistant.com.cn/api/cnd-discordapp");
             if (StringUtils.isNotEmpty(url)) {
                 WxMpTemplateMessage wxMpTemplateMessage = WxMpTemplateMessage.builder()
                         .templateId("K_WOhj5KoEgBc7MomCHL4wbq6i82ULsyxDDKepVnZVs")
-                        .url(url)
+                        .url(replace)
                         .toUser(openid)
                         .data(data)
                         .build();

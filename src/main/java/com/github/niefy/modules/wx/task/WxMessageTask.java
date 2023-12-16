@@ -28,9 +28,11 @@ public class WxMessageTask {
     @Scheduled(cron = "0/10 * * * * ?")
     public void message() {
         List<String> keys = new ArrayList<>(redisTemplate.keys("wxcomImg::*"));
+        log.info("keys:{}",keys);
         keys.stream().forEach(key -> {
             String taskid = redisTemplate.opsForValue().get(key).toString().split("@")[0];
             String openid = redisTemplate.opsForValue().get(key).toString().split("@")[1];
+            log.info("taskid:{},openid:{}",taskid,openid);
             sendTemplateMsg(openid, taskid);
         });
     }
@@ -42,10 +44,12 @@ public class WxMessageTask {
         data.add(new WxMpTemplateData("time3", DateUtils.format(new Date(), "yyyy-MM-dd HH:mm")));
         String key = "mj-task-store::".concat(taskid);
         String delKey = "wxcomImg::".concat(taskid);
+        log.info("key:{},delkey:{}",key,delKey);
         if (ObjectUtils.isNotEmpty(redisTemplate.opsForValue().get(key))) {
             String url = JSON.parseObject(redisTemplate.opsForValue().get(key).toString()).getString("imageUrl");
             String s = url.split("\\?ex=")[0];
             String replace = s.replace("https://cdn.discordapp.com", "http://www.ai-assistant.com.cn/api/cnd-discordapp");
+            log.info("图片内容:{}",replace);
             if (StringUtils.isNotEmpty(url)) {
                 WxMpTemplateMessage wxMpTemplateMessage = WxMpTemplateMessage.builder()
                         .templateId("K_WOhj5KoEgBc7MomCHL4wbq6i82ULsyxDDKepVnZVs")

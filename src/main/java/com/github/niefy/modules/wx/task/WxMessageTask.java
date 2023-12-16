@@ -1,11 +1,13 @@
 package com.github.niefy.modules.wx.task;
 
+import com.alibaba.fastjson.JSON;
 import com.github.niefy.common.utils.DateUtils;
 import com.github.niefy.modules.wx.service.TemplateMsgService;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.mp.bean.template.WxMpTemplateData;
 import me.chanjar.weixin.mp.bean.template.WxMpTemplateMessage;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.*;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -25,14 +27,11 @@ public class WxMessageTask {
 
     @Scheduled(cron = "0/10 * * * * ?")
     public void message() {
-        List<String> keys = new ArrayList<>(redisTemplate.keys("taskdone-*"));
+        List<String> keys = new ArrayList<>(redisTemplate.keys("wxcomImg::*"));
         keys.stream().forEach(key -> {
-            String taskid = key.split("taskdone-")[1];
-            List<String> keys2 = new ArrayList<String>(redisTemplate.keys(taskid.concat("-*")));
-            keys2.stream().forEach(key2 -> {
-                String openid = key2.split(taskid.concat("-"))[1];
-                sendTemplateMsg(openid, taskid);
-            });
+            String taskid = redisTemplate.opsForValue().get(key).toString().split("@")[0];
+            String openid = redisTemplate.opsForValue().get(key).toString().split("@")[1];
+            sendTemplateMsg(openid, taskid);
         });
     }
 
@@ -41,18 +40,20 @@ public class WxMessageTask {
         List<WxMpTemplateData> data = new ArrayList<>();
         data.add(new WxMpTemplateData("character_string2", taskid));
         data.add(new WxMpTemplateData("time3", DateUtils.format(new Date(), "yyyy-MM-dd HH:mm")));
-        if (ObjectUtils.isNotEmpty(redisTemplate.opsForValue().get(taskid))) {
-            String url = redisTemplate.opsForValue().get(taskid).toString();
-            WxMpTemplateMessage wxMpTemplateMessage = WxMpTemplateMessage.builder()
-                    .templateId("K_WOhj5KoEgBc7MomCHL4wbq6i82ULsyxDDKepVnZVs")
-                    .url(url)
-                    .toUser(openid)
-                    .data(data)
-                    .build();
-            templateMsgService.sendTemplateMsg(wxMpTemplateMessage, appid);
-            redisTemplate.opsForValue().getAndSet(taskid.concat("-").concat(openid),url);
-            redisTemplate.delete(taskid);
-            redisTemplate.delete("taskdone-".concat(taskid));
+        String key = "mj-task-store::".concat(taskid);
+        String delKey = "wxcomImg::".concat(taskid);
+        if (ObjectUtils.isNotEmpty(redisTemplate.opsForValue().get(key))) {
+            String url = JSON.parseObject(redisTemplate.opsForValue().get(key).toString()).getString("imageUrl");
+            if (StringUtils.isNotEmpty(url)) {
+                WxMpTemplateMessage wxMpTemplateMessage = WxMpTemplateMessage.builder()
+                        .templateId("K_WOhj5KoEgBc7MomCHL4wbq6i82ULsyxDDKepVnZVs")
+                        .url(url)
+                        .toUser(openid)
+                        .data(data)
+                        .build();
+                templateMsgService.sendTemplateMsg(wxMpTemplateMessage, appid);
+                redisTemplate.delete(delKey);
+            }
         }
     }
 }

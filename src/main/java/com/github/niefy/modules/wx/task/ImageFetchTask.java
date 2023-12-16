@@ -1,3 +1,4 @@
+/*
 package com.github.niefy.modules.wx.task;
 
 import com.alibaba.fastjson.JSON;
@@ -71,3 +72,4 @@ public class ImageFetchTask {
         }
     }
 }
+*/

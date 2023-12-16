@@ -67,9 +67,9 @@ public class MsgHandler extends AbstractHandler {
             String prompt = wxMessage.getContent().substring(4).trim();
             JSONObject res = genImg(prompt,wxMessage.getFromUser());
             String imgUrl = String.format("%s\n%s生成中，系统即将返回生成结果...",res.getString("result"),prompt);
-            JSONObject jsonObject = JSON.parseObject(redisTemplate.opsForValue().get("mj-task-store::").toString());
-            logger.info("jsonobject:{}",jsonObject);
-            imgUrl = jsonObject.getString("imageUrl");
+            String key = "wxcomImg::".concat(res.getString("result"));
+            String val = res.getString("result").concat("@").concat(fromUser);
+            redisTemplate.opsForValue().set(key,val,3600);
             msgReplyService.gptReturn(appid,"text", fromUser, imgUrl);
             wxMsgService.addWxMsg(WxMsg.buildOutMsg(WxConsts.KefuMsgType.TEXT,fromUser,null));
             return WxMpXmlOutMessage

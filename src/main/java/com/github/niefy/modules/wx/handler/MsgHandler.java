@@ -17,6 +17,7 @@ import me.chanjar.weixin.mp.util.WxMpConfigStorageHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -43,6 +44,9 @@ public class MsgHandler extends AbstractHandler {
     private static final String TRANSFER_CUSTOMER_SERVICE_KEY = "人工";
     RestTemplate restTemplate = new RestTemplate();
 
+    @Autowired
+    private RedisTemplate redisTemplate;
+
     @Override
     public WxMpXmlOutMessage handle(WxMpXmlMessage wxMessage,
                                     Map<String, Object> context, WxMpService wxMpService,
@@ -63,9 +67,9 @@ public class MsgHandler extends AbstractHandler {
             String prompt = wxMessage.getContent().substring(4).trim();
             JSONObject res = genImg(prompt,wxMessage.getFromUser());
             String imgUrl = String.format("%s\n%s生成中，系统即将返回生成结果...",res.getString("result"),prompt);
-            if(!res.getString("code").equals("1")){
-                imgUrl = res.getString("description");
-            }
+            JSONObject jsonObject = JSON.parseObject(redisTemplate.opsForValue().get("mj-task-store::").toString());
+            logger.info("jsonobject:{}",jsonObject);
+            imgUrl = jsonObject.getString("imageUrl");
             msgReplyService.gptReturn(appid,"text", fromUser, imgUrl);
             wxMsgService.addWxMsg(WxMsg.buildOutMsg(WxConsts.KefuMsgType.TEXT,fromUser,null));
             return WxMpXmlOutMessage

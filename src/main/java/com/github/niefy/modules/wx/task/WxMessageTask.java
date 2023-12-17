@@ -30,8 +30,8 @@ public class WxMessageTask {
         List<String> keys = new ArrayList<>(redisTemplate.keys("wxcomImg::*"));
         log.info("keys:{}",keys);
         keys.stream().forEach(key -> {
-            String taskid = redisTemplate.opsForValue().get(key).toString().split("@")[0];
-            String openid = redisTemplate.opsForValue().get(key).toString().split("@")[1];
+            String openid = redisTemplate.opsForValue().get(key).toString().split("@")[0];
+            String taskid = redisTemplate.opsForValue().get(key).toString().split("@")[1];
             sendTemplateMsg(openid, taskid);
         });
     }

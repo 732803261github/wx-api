@@ -94,7 +94,7 @@ public class MsgHandler extends AbstractHandler {
         HttpEntity requestEntity = new HttpEntity(map,headers);
         //python接口服务
         String response = restTemplate.exchange(
-                "http://ai-assistant.com.cn:8081/wxcom/message",
+                "http://ai-assistant.com.cn:8081/wxcom/singlechat",
                 HttpMethod.POST,
                 requestEntity,
                 String.class

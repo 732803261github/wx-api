@@ -67,6 +67,8 @@ public class MsgHandler extends AbstractHandler {
             String prompt = wxMessage.getContent().substring(4).trim();
             JSONObject res = genImg(prompt,wxMessage.getFromUser());
             String imgUrl = String.format("%s\n%s生成中，系统即将返回生成结果...",res.getString("result"),prompt);
+            logger.info("res:{}",JSON.toJSONString(res));
+            logger.info("res.getString(result):{}",res.getString("result"));
             String key = "wxcomImg::".concat(res.getString("result"));
             String val = res.getString("result").concat("@").concat(fromUser);
             redisTemplate.opsForValue().set(key,val,3600);

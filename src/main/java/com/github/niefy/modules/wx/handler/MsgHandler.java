@@ -41,7 +41,7 @@ public class MsgHandler extends AbstractHandler {
     RestTemplate restTemplate = new RestTemplate();
 
     @Autowired
-    RedisTemplate redisTemplate;
+    StringRedisTemplate redisTemplate;
 
     @Override
     public WxMpXmlOutMessage handle(WxMpXmlMessage wxMessage,

@@ -37,7 +37,8 @@ public class OffLineImgGetController {
                 String key = "mj-task-store::".concat(taskid);
                 if (ObjectUtils.isNotEmpty(redisTemplate.opsForValue().get(key))) {
                     String url = JSON.parseObject(redisTemplate.opsForValue().get(key).toString()).getString("imageUrl");
-                    map.put(taskid, url);
+                    String replace = url.replace("https://cdn.discordapp.com", "http://www.ai-assistant.com.cn/api/cnd-discordapp");
+                    map.put(taskid, replace);
                 }
             });
             return R.ok().put(map);

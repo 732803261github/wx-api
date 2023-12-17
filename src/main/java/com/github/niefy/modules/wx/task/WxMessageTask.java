@@ -27,11 +27,10 @@ public class WxMessageTask {
 
     @Scheduled(cron = "0/10 * * * * ?")
     public void message() {
-        List<String> keys = new ArrayList<>(redisTemplate.keys("wxcomImg::*"));
-        log.info("keys:{}",keys);
+        List<String> keys = new ArrayList<>(redisTemplate.keys("bindopenid::*"));
         keys.stream().forEach(key -> {
-            String openid = redisTemplate.opsForValue().get(key).toString().split("@")[0];
-            String taskid = redisTemplate.opsForValue().get(key).toString().split("@")[1];
+            String openid = redisTemplate.opsForValue().get(key).toString();
+            String taskid = key.split("bindopenid::")[1];
             sendTemplateMsg(openid, taskid);
         });
     }
@@ -42,9 +41,7 @@ public class WxMessageTask {
         data.add(new WxMpTemplateData("character_string2", taskid));
         data.add(new WxMpTemplateData("time3", DateUtils.format(new Date(), "yyyy-MM-dd HH:mm")));
         String key = "mj-task-store::".concat(taskid);
-        String delKey = "wxcomImg::".concat(taskid);
-        log.info("key:{},delkey:{}",key,delKey);
-        log.info(key.concat("{}"),redisTemplate.opsForValue().get(key));
+        String delKey = "bindopenid::".concat(taskid);
         if (ObjectUtils.isNotEmpty(redisTemplate.opsForValue().get(key))) {
             String url = JSON.parseObject(redisTemplate.opsForValue().get(key).toString()).getString("imageUrl");
             String s = url.split("\\?ex=")[0];

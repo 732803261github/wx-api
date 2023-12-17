@@ -2,13 +2,9 @@ package com.github.niefy.modules.wx.handler;
 
 
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.github.niefy.config.TaskExcutor;
-import com.github.niefy.modules.wx.entity.MsgReplyRule;
 import com.github.niefy.modules.wx.entity.WxMsg;
 import com.github.niefy.modules.wx.service.MsgReplyService;
 import com.github.niefy.modules.wx.service.WxMsgService;
@@ -17,7 +13,7 @@ import me.chanjar.weixin.mp.util.WxMpConfigStorageHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.*;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -45,7 +41,7 @@ public class MsgHandler extends AbstractHandler {
     RestTemplate restTemplate = new RestTemplate();
 
     @Autowired
-    private RedisTemplate redisTemplate;
+    RedisTemplate redisTemplate;
 
     @Override
     public WxMpXmlOutMessage handle(WxMpXmlMessage wxMessage,

@@ -2,6 +2,7 @@ package com.github.niefy.modules.wx.handler;
 
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -41,7 +42,7 @@ public class MsgHandler extends AbstractHandler {
     RestTemplate restTemplate = new RestTemplate();
 
     @Autowired
-    StringRedisTemplate redisTemplate;
+    RedisTemplate redisTemplate;
 
     @Override
     public WxMpXmlOutMessage handle(WxMpXmlMessage wxMessage,
@@ -64,7 +65,7 @@ public class MsgHandler extends AbstractHandler {
             JSONObject res = genImg(prompt,wxMessage.getFromUser());
             String imgUrl = String.format("%s\n%s生成中，系统即将返回生成结果...",res.getString("result"),prompt);
             String key = "bindopenid::".concat(res.getString("result"));
-            redisTemplate.opsForValue().set(key,fromUser,3600);
+            redisTemplate.opsForValue().set(key,fromUser,3600, TimeUnit.SECONDS);
             msgReplyService.gptReturn(appid,"text", fromUser, imgUrl);
             wxMsgService.addWxMsg(WxMsg.buildOutMsg(WxConsts.KefuMsgType.TEXT,fromUser,null));
             return WxMpXmlOutMessage

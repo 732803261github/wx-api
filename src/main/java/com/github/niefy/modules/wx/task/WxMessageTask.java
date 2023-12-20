@@ -2,6 +2,7 @@ package com.github.niefy.modules.wx.task;
 
 import com.alibaba.fastjson.JSON;
 import com.github.niefy.common.utils.DateUtils;
+import com.github.niefy.modules.wx.service.MsgReplyService;
 import com.github.niefy.modules.wx.service.TemplateMsgService;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.mp.bean.template.WxMpTemplateData;
@@ -21,6 +22,9 @@ public class WxMessageTask {
 
     @Autowired
     RedisTemplate redisTemplate;
+
+    @Autowired
+    MsgReplyService msgReplyService;
 
     @Autowired
     private TemplateMsgService templateMsgService;
@@ -48,14 +52,16 @@ public class WxMessageTask {
             String s = url.split("\\?ex=")[0];
             String replace = s.replace("https://cdn.discordapp.com", "http://www.ai-assistant.com.cn/api/cnd-discordapp");
             log.info("图片内容:{}",replace);
+            String genImg = "图片已生成，请在外部浏览器打开".concat(replace);
             if (StringUtils.isNotEmpty(url) && "SUCCESS".equals(status)) {
-                WxMpTemplateMessage wxMpTemplateMessage = WxMpTemplateMessage.builder()
-                        .templateId("K_WOhj5KoEgBc7MomCHL4wbq6i82ULsyxDDKepVnZVs")
-                        .url(replace)
-                        .toUser(openid)
-                        .data(data)
-                        .build();
-                templateMsgService.sendTemplateMsg(wxMpTemplateMessage, appid);
+                msgReplyService.gptReturn(appid,"text", openid, genImg);
+//                WxMpTemplateMessage wxMpTemplateMessage = WxMpTemplateMessage.builder()
+//                        .templateId("K_WOhj5KoEgBc7MomCHL4wbq6i82ULsyxDDKepVnZVs")
+//                        .url(replace)
+//                        .toUser(openid)
+//                        .data(data)
+//                        .build();
+//                templateMsgService.sendTemplateMsg(wxMpTemplateMessage, appid);
                 redisTemplate.delete(delKey);
             }
         }

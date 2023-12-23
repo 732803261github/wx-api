@@ -50,7 +50,7 @@ public class WxMessageTask {
             String url = JSON.parseObject(redisTemplate.opsForValue().get(key).toString()).getString("imageUrl");
             String status = JSON.parseObject(redisTemplate.opsForValue().get(key).toString()).getString("status");
             String s = url.split("\\?ex=")[0];
-            String replace = s.replace("https://cdn.discordapp.com", "http://www.ai-assistant.com.cn/api/cnd-discordapp");
+            String replace = s.replace("https://cdn.discordapp.com", "https://www.ai-assistant.com.cn/api/cnd-discordapp");
             log.info("图片内容:{}",replace);
             String genImg = "图片已生成，请在外部浏览器打开".concat(replace);
             if (StringUtils.isNotEmpty(url) && "SUCCESS".equals(status)) {
